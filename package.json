@@ -3,23 +3,23 @@
   "displayName": "Tree Todo List",
   "description": "A simple extension for managing Todo items as a tree view",
   "private": true,
-  "version": "0.0.1",
-	"license": "GPL-3.0",  
+  "version": "0.0.2",
+  "license": "GPL-3.0",
   "publisher": "RaphKa02",
-	"keywords": [
-		"todo",
+  "keywords": [
+    "todo",
     "list",
     "tree",
     "todo list tree",
     "task",
     "tasklist"
-	],
-	"author": {
-		"email": "it@karl-raphael.de",
-		"name": "Raphael Karl"
-	},
-	"readme": "./README.md",
-	"icon": "images/logo.png",
+  ],
+  "author": {
+    "email": "it@karl-raphael.de",
+    "name": "Raphael Karl"
+  },
+  "readme": "./README.md",
+  "icon": "images/logo.png",
   "categories": [
     "Visualization"
   ],
@@ -27,16 +27,17 @@
     "ui",
     "workspace"
   ],
+  "type": "module",
   "engines": {
     "vscode": "^1.80.0"
   },
   "activationEvents": [],
   "main": "./dist/extension.js",
-	"capabilities": {
-		"untrustedWorkspaces": {
-			"supported": true
-		}
-	},
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": true
+    }
+  },
   "contributes": {
     "customEditors": [
       {
@@ -53,9 +54,36 @@
     "commands": [
       {
         "command": "tree-todo-list.newTreeTodo",
-        "title": "New Tree ToDo List"
+        "title": "New Tree ToDo List",
+        "category": "TreeToDo"
+      },
+      {
+        "command": "tree-todo-list.viewSource",
+        "title": "View Source",
+        "icon": "$(code)",
+        "category": "TreeToDo"
+      },
+      {
+        "command": "tree-todo-list.viewCustomEditor",
+        "title": "Open Editor",
+        "icon": "$(preview)",
+        "category": "TreeToDo"
       }
-    ]
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "tree-todo-list.viewSource",
+          "when": "activeCustomEditorId == 'tree-todo-list.editor'",
+          "group": "navigation"
+        },
+        {
+          "command": "tree-todo-list.viewCustomEditor",
+          "when": "resourceExtname == '.treetodo' && activeCustomEditorId != 'tree-todo-list.editor'",
+          "group": "navigation"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "pnpm run compile",

@@ -29,7 +29,12 @@ body {
 	align-items: flex-start;
 	min-width: 100%;
 	min-height: 100%;
-	overflow: auto;
+	overflow: visible;
+	pointer-events: none;
+}
+
+#container > * {
+	pointer-events: auto;
 }
 
 .column {
@@ -40,22 +45,63 @@ body {
 }
 
 .card {
+	--card-theme: #555;
 	background-color: #1e1e1e;
-	border: 1px solid #333;
+	border: 2px solid var(--card-theme);
 	border-radius: 12px;
 	padding: 20px;
 	min-width: 250px;
 	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 	position: relative;
+	transition: border-color 0.3s;
+}
+
+.card.completed {
+	--card-theme: #4caf50;
 }
 
 .card-header {
 	display: flex;
 	align-items: center;
-	gap: 8px;
+	justify-content: space-between;
 	margin-bottom: 20px;
 	font-weight: bold;
 	font-size: 1.1em;
+}
+
+.card-header-left {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.drag-handle {
+	cursor: grab;
+	opacity: 0.3;
+	padding: 0 4px;
+	user-select: none;
+	transition: opacity 0.2s;
+	font-size: 0.8em;
+}
+
+.drag-handle:hover {
+	opacity: 0.8;
+}
+
+.drag-handle:active {
+	cursor: grabbing;
+}
+
+.delete-task-btn {
+	cursor: pointer;
+	opacity: 0.5;
+	transition: opacity 0.2s;
+	font-size: 0.8em;
+}
+
+.delete-task-btn:hover {
+	opacity: 1;
+	color: #f44336;
 }
 
 .card-items {
@@ -64,25 +110,80 @@ body {
 	gap: 12px;
 }
 
+.item-row {
+	display: flex;
+	align-items: center;
+	position: relative;
+	gap: 4px;
+}
+
 .item {
 	display: flex;
 	align-items: center;
 	gap: 10px;
 	padding: 4px 0;
+	flex: 1;
+}
+
+.item-actions {
+	display: flex;
+	gap: 4px;
+	opacity: 0;
+	transition: opacity 0.2s;
+}
+
+.item-row:hover .item-actions {
+	opacity: 1;
+}
+
+.action-btn {
+	cursor: pointer;
+	font-size: 0.9em;
+	padding: 2px;
+	border-radius: 4px;
+	background: #333;
+	line-height: 1;
+}
+
+.action-btn:hover {
+	background: #444;
+}
+
+.add-item-btn {
+	margin-top: 15px;
+	padding: 6px;
+	text-align: center;
+	border: 1px dashed #444;
+	border-radius: 6px;
+	cursor: pointer;
+	font-size: 0.85em;
+	width: 70%;
+	color: #888;
+	transition: all 0.2s;
+}
+
+.add-item-btn:hover {
+	border-color: #666;
+	color: #ccc;
+	background: rgba(255, 255, 255, 0.05);
 }
 
 .item-toggle {
 	width: 18px;
 	height: 18px;
-	border: 2px solid #555;
+	border: 2px solid var(--card-theme);
 	border-radius: 50%;
 	cursor: pointer;
 	position: relative;
 }
 
 .item-toggle.completed {
-	background-color: #555;
-	border-color: #555;
+	background-color: var(--card-theme);
+}
+
+.item-toggle.disabled {
+	cursor: default;
+	opacity: 0.6;
 }
 
 .item-toggle.completed::after {
@@ -97,9 +198,26 @@ body {
 	transform: rotate(45deg);
 }
 
-.item-title {
+.title, .item-title {
 	flex: 1;
 	font-size: 0.9em;
+	padding: 2px 4px;
+	border-radius: 4px;
+	outline: none;
+	transition: background-color 0.2s;
+}
+
+.title:hover, .item-title:hover {
+	background-color: rgba(255, 255, 255, 0.05);
+}
+
+.title:focus, .item-title:focus {
+	background-color: rgba(255, 255, 255, 0.1);
+	box-shadow: 0 0 0 1px #555;
+}
+
+.card-header .title {
+	font-size: 1em;
 }
 
 .progress-container {
@@ -132,7 +250,7 @@ body {
 }
 
 .circular-progress .fg {
-	stroke: #555;
+	stroke: var(--card-theme);
 	stroke-dasharray: 100;
 	stroke-dashoffset: 100;
 	transition: stroke-dashoffset 0.3s;
@@ -169,12 +287,14 @@ body {
 	transform: translateY(-50%);
 }
 
-.dragging {
-	opacity: 0.5;
+.dragging, .dragging-card {
+	opacity: 0.4;
 }
 
-.item-row {
-    display: flex;
-    align-items: center;
-    position: relative;
+.dragging-card {
+	border-style: dashed;
+}
+
+.card:not(.dragging-card):hover {
+	box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
 }

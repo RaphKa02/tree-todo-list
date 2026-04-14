@@ -1,12 +1,13 @@
 import * as vscode from 'vscode';
 import { getNonce } from './util.js';
+import { AppState } from './types.js';
 
 export class TreeTodoEditorProvider implements vscode.CustomTextEditorProvider {
 
 	public static register(context: vscode.ExtensionContext): vscode.Disposable {
 		const provider = new TreeTodoEditorProvider(context);
 		const providerRegistration = vscode.window.registerCustomEditorProvider(TreeTodoEditorProvider.viewType, provider);
-		
+
 		const commandRegistration = vscode.commands.registerCommand('tree-todo-list.newTreeTodo', () => {
 			const workspaceFolders = vscode.workspace.workspaceFolders;
 			if (!workspaceFolders) {
@@ -36,7 +37,27 @@ export class TreeTodoEditorProvider implements vscode.CustomTextEditorProvider {
 			});
 		});
 
-		return vscode.Disposable.from(providerRegistration, commandRegistration);
+		const viewSourceRegistration = vscode.commands.registerCommand('tree-todo-list.viewSource', (uri?: vscode.Uri) => {
+			const resource = uri || (vscode.window.tabGroups.activeTabGroup.activeTab?.input as any)?.uri;
+			if (resource) {
+				vscode.commands.executeCommand('vscode.openWith', resource, 'default', {
+					viewColumn: vscode.ViewColumn.Active,
+					preserveFocus: false
+				});
+			}
+		});
+
+		const viewCustomRegistration = vscode.commands.registerCommand('tree-todo-list.viewCustomEditor', (uri?: vscode.Uri) => {
+			const resource = uri || (vscode.window.tabGroups.activeTabGroup.activeTab?.input as any)?.uri;
+			if (resource) {
+				vscode.commands.executeCommand('vscode.openWith', resource, TreeTodoEditorProvider.viewType, {
+					viewColumn: vscode.ViewColumn.Active,
+					preserveFocus: false
+				});
+			}
+		});
+
+		return vscode.Disposable.from(providerRegistration, commandRegistration, viewSourceRegistration, viewCustomRegistration);
 	}
 
 	private static readonly viewType = 'tree-todo-list.editor';
@@ -74,9 +95,18 @@ export class TreeTodoEditorProvider implements vscode.CustomTextEditorProvider {
 
 		webviewPanel.webview.onDidReceiveMessage(e => {
 			switch (e.type) {
+				case 'ready':
+					updateWebview();
+					return;
 				case 'update':
 					this.updateTextDocument(document, e.state);
 					return;
+			}
+		});
+
+		webviewPanel.onDidChangeViewState(e => {
+			if (e.webviewPanel.visible) {
+				updateWebview();
 			}
 		});
 
@@ -85,7 +115,7 @@ export class TreeTodoEditorProvider implements vscode.CustomTextEditorProvider {
 
 	private getHtmlForWebview(webview: vscode.Webview): string {
 		const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(
-			this.context.extensionUri, 'media', 'treeTodo.js'));
+			this.context.extensionUri, 'dist', 'webview', 'treeTodo.js'));
 
 		const styleMainUri = webview.asWebviewUri(vscode.Uri.joinPath(
 			this.context.extensionUri, 'media', 'treeTodo.css'));
@@ -107,12 +137,12 @@ export class TreeTodoEditorProvider implements vscode.CustomTextEditorProvider {
 					<canvas id="connections"></canvas>
 					<div id="container"></div>
 				</div>
-				<script nonce="${nonce}" src="${scriptUri}"></script>
+				<script type="module" nonce="${nonce}" src="${scriptUri}"></script>
 			</body>
-			</html>`;
+</html>`;
 	}
 
-	private updateTextDocument(document: vscode.TextDocument, json: any) {
+	private updateTextDocument(document: vscode.TextDocument, json: AppState) {
 		const edit = new vscode.WorkspaceEdit();
 		edit.replace(
 			document.uri,
