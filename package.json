@@ -23,13 +23,36 @@
           }
         ],
         "priority": "default"
-      }
+      },
+      {
+				"viewType": "catCustoms.catScratch",
+				"displayName": "Cat Scratch",
+				"selector": [
+					{
+						"filenamePattern": "*.cscratch"
+					}
+				]
+			},
+			{
+				"viewType": "catCustoms.pawDraw",
+				"displayName": "Paw Draw",
+				"selector": [
+					{
+						"filenamePattern": "*.pawdraw"
+					}
+				]
+			}
     ],
     "commands": [
       {
         "command": "tree-todo-list.newTreeTodo",
         "title": "New Tree ToDo List"
-      }
+      },
+      {
+				"command": "catCustoms.pawDraw.new",
+				"title": "Create new Paw Draw Document",
+				"category": "Paw Draw"
+			}
     ]
   },
   "scripts": {
