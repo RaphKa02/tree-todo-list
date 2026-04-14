@@ -1,0 +1,180 @@
+body {
+	background-color: var(--vscode-editor-background);
+	color: var(--vscode-editor-foreground);
+	font-family: var(--vscode-font-family);
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+}
+
+#app {
+	position: relative;
+	width: 100vw;
+	height: 100vh;
+	background-image: radial-gradient(circle, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+	background-size: 20px 20px;
+}
+
+#connections {
+	position: absolute;
+	top: 0;
+	left: 0;
+	pointer-events: none;
+}
+
+#container {
+	display: flex;
+	padding: 40px;
+	gap: 100px;
+	align-items: flex-start;
+	min-width: 100%;
+	min-height: 100%;
+	overflow: auto;
+}
+
+.column {
+	display: flex;
+	flex-direction: column;
+	gap: 40px;
+	min-width: 300px;
+}
+
+.card {
+	background-color: #1e1e1e;
+	border: 1px solid #333;
+	border-radius: 12px;
+	padding: 20px;
+	min-width: 250px;
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+	position: relative;
+}
+
+.card-header {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-bottom: 20px;
+	font-weight: bold;
+	font-size: 1.1em;
+}
+
+.card-items {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.item {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 4px 0;
+}
+
+.item-toggle {
+	width: 18px;
+	height: 18px;
+	border: 2px solid #555;
+	border-radius: 50%;
+	cursor: pointer;
+	position: relative;
+}
+
+.item-toggle.completed {
+	background-color: #555;
+	border-color: #555;
+}
+
+.item-toggle.completed::after {
+	content: '';
+	position: absolute;
+	left: 5px;
+	top: 2px;
+	width: 4px;
+	height: 8px;
+	border: solid white;
+	border-width: 0 2px 2px 0;
+	transform: rotate(45deg);
+}
+
+.item-title {
+	flex: 1;
+	font-size: 0.9em;
+}
+
+.progress-container {
+	position: absolute;
+	bottom: 12px;
+	right: 12px;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 0.8em;
+	color: #888;
+}
+
+.circular-progress {
+	width: 24px;
+	height: 24px;
+}
+
+.circular-progress svg {
+	transform: rotate(-90deg);
+}
+
+.circular-progress circle {
+	fill: none;
+	stroke-width: 3;
+}
+
+.circular-progress .bg {
+	stroke: #333;
+}
+
+.circular-progress .fg {
+	stroke: #555;
+	stroke-dasharray: 100;
+	stroke-dashoffset: 100;
+	transition: stroke-dashoffset 0.3s;
+}
+
+.port {
+	position: absolute;
+	width: 8px;
+	height: 8px;
+	background-color: white;
+	border-radius: 50%;
+	right: -4px;
+	top: 50%;
+	transform: translateY(-50%);
+}
+
+.item-port {
+	position: absolute;
+	width: 8px;
+	height: 8px;
+	background-color: white;
+	border-radius: 50%;
+	right: -24px;
+}
+
+.in-port {
+	position: absolute;
+	width: 8px;
+	height: 8px;
+	background-color: white;
+	border-radius: 50%;
+	left: -4px;
+	top: 50%;
+	transform: translateY(-50%);
+}
+
+.dragging {
+	opacity: 0.5;
+}
+
+.item-row {
+    display: flex;
+    align-items: center;
+    position: relative;
+}

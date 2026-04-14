@@ -1,0 +1,76 @@
+{
+  "tasks": [
+    {
+      "id": "root",
+      "title": "Project Roadmap",
+      "items": [
+        {
+          "id": "item-1",
+          "title": "Frontend Development",
+          "completed": false,
+          "linksTo": "task-frontend"
+        },
+        {
+          "id": "item-2",
+          "title": "Backend Services",
+          "completed": true,
+          "linksTo": "task-backend"
+        },
+        {
+          "id": "item-3",
+          "title": "Final Deployment",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "id": "task-frontend",
+      "title": "Frontend Development",
+      "items": [
+        {
+          "id": "fe-1",
+          "title": "UI Components",
+          "completed": false,
+          "linksTo": "task-ui"
+        },
+        {
+          "id": "fe-2",
+          "title": "State Management",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "id": "task-backend",
+      "title": "Backend Services",
+      "items": [
+        {
+          "id": "be-1",
+          "title": "Database Schema",
+          "completed": true
+        },
+        {
+          "id": "be-2",
+          "title": "API Auth",
+          "completed": true
+        }
+      ]
+    },
+    {
+      "id": "task-ui",
+      "title": "UI Components",
+      "items": [
+        {
+          "id": "ui-1",
+          "title": "Buttons & Inputs",
+          "completed": false
+        },
+        {
+          "id": "ui-2",
+          "title": "Canvas Renderer",
+          "completed": false
+        }
+      ]
+    }
+  ]
+}

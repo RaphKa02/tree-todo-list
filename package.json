@@ -1,17 +1,42 @@
 {
   "name": "tree-todo-list",
-  "displayName": "Tree ToDo List",
-  "description": "A simple extension for managing ToDo items as a tree view",
-  "version": "0.0.1",
+  "displayName": "Tree Todo List",
+  "description": "A simple extension for managing Todo items as a tree view",
   "private": true,
+  "version": "0.0.1",
+	"license": "GPL-3.0",  
+  "publisher": "RaphKa02",
+	"keywords": [
+		"todo",
+    "list",
+    "tree",
+    "todo list tree",
+    "task",
+    "tasklist"
+	],
+	"author": {
+		"email": "it@karl-raphael.de",
+		"name": "Raphael Karl"
+	},
+	"readme": "./README.md",
+	"icon": "images/logo.png",
+  "categories": [
+    "Visualization"
+  ],
+  "extensionKind": [
+    "ui",
+    "workspace"
+  ],
   "engines": {
     "vscode": "^1.80.0"
   },
-  "categories": [
-    "Other"
-  ],
   "activationEvents": [],
   "main": "./dist/extension.js",
+	"capabilities": {
+		"untrustedWorkspaces": {
+			"supported": true
+		}
+	},
   "contributes": {
     "customEditors": [
       {
@@ -23,36 +48,13 @@
           }
         ],
         "priority": "default"
-      },
-      {
-				"viewType": "catCustoms.catScratch",
-				"displayName": "Cat Scratch",
-				"selector": [
-					{
-						"filenamePattern": "*.cscratch"
-					}
-				]
-			},
-			{
-				"viewType": "catCustoms.pawDraw",
-				"displayName": "Paw Draw",
-				"selector": [
-					{
-						"filenamePattern": "*.pawdraw"
-					}
-				]
-			}
+      }
     ],
     "commands": [
       {
         "command": "tree-todo-list.newTreeTodo",
         "title": "New Tree ToDo List"
-      },
-      {
-				"command": "catCustoms.pawDraw.new",
-				"title": "Create new Paw Draw Document",
-				"category": "Paw Draw"
-			}
+      }
     ]
   },
   "scripts": {
