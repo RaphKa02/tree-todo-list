@@ -3,7 +3,7 @@
   "displayName": "Tree Todo List",
   "description": "A simple extension for managing Todo items as a tree view",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "GPL-3.0",
   "publisher": "RaphKa02",
   "keywords": [

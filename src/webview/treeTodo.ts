@@ -749,7 +749,12 @@ declare function acquireVsCodeApi(): VsCodeApi;
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+
+    const style = getComputedStyle(document.body);
+    const connectionColor = style.getPropertyValue('--connection-color').trim() || 'rgba(255, 255, 255, 0.4)';
+    const portColor = style.getPropertyValue('--port-bg').trim() || 'white';
+
+    ctx.strokeStyle = connectionColor;
     ctx.lineWidth = 2;
 
     state.tasks.forEach((task) => {
@@ -779,7 +784,7 @@ declare function acquireVsCodeApi(): VsCodeApi;
             ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, endX, endY);
             ctx.stroke();
 
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.fillStyle = portColor;
             ctx.beginPath();
             ctx.arc(endX, endY, 4, 0, Math.PI * 2);
             ctx.fill();

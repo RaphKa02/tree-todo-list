@@ -1,3 +1,39 @@
+:root {
+  --grid-color: rgba(255, 255, 255, 0.05);
+  --card-bg: #1e1e1e;
+  --card-shadow: rgba(0, 0, 0, 0.3);
+  --btn-bg: #333;
+  --btn-hover-bg: #444;
+  --item-hover-bg: rgba(255, 255, 255, 0.05);
+  --input-focus-bg: rgba(255, 255, 255, 0.1);
+  --input-focus-shadow: #555;
+  --progress-bg: #333;
+  --port-bg: white;
+  --add-btn-border: #444;
+  --add-btn-text: #888;
+  --add-btn-hover-border: #666;
+  --add-btn-hover-text: #ccc;
+  --connection-color: rgba(255, 255, 255, 0.4);
+}
+
+.vscode-light {
+  --grid-color: rgba(0, 0, 0, 0.05);
+  --card-bg: #ffffff;
+  --card-shadow: rgba(0, 0, 0, 0.1);
+  --btn-bg: #eeeeee;
+  --btn-hover-bg: #e0e0e0;
+  --item-hover-bg: rgba(0, 0, 0, 0.03);
+  --input-focus-bg: rgba(0, 0, 0, 0.05);
+  --input-focus-shadow: #ccc;
+  --progress-bg: #eeeeee;
+  --port-bg: #333;
+  --add-btn-border: #ccc;
+  --add-btn-text: #666;
+  --add-btn-hover-border: #999;
+  --add-btn-hover-text: #333;
+  --connection-color: rgba(0, 0, 0, 0.2);
+}
+
 body {
   background-color: var(--vscode-editor-background);
   color: var(--vscode-editor-foreground);
@@ -11,7 +47,7 @@ body {
   position: relative;
   width: 100vw;
   height: 100vh;
-  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-image: radial-gradient(circle, var(--grid-color) 1px, transparent 1px);
   background-size: 20px 20px;
 }
 
@@ -49,7 +85,7 @@ body {
   padding: 4px;
   border-radius: 4px;
   border: 1px solid var(--vscode-panel-border);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 12px var(--card-shadow);
 }
 
 .tool-btn {
@@ -79,12 +115,12 @@ body {
 
 .card {
   --card-theme: #555;
-  background-color: #1e1e1e;
+  background-color: var(--card-bg);
   border: 2px solid var(--card-theme);
   border-radius: 12px;
   padding: 20px;
   min-width: 250px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 6px var(--card-shadow);
   position: relative;
   transition: border-color 0.3s;
 }
@@ -174,31 +210,31 @@ body {
   font-size: 0.9em;
   padding: 2px;
   border-radius: 4px;
-  background: #333;
+  background: var(--btn-bg);
   line-height: 1;
 }
 
 .action-btn:hover {
-  background: #444;
+  background: var(--btn-hover-bg);
 }
 
 .add-item-btn {
   margin-top: 15px;
   padding: 6px;
   text-align: center;
-  border: 1px dashed #444;
+  border: 1px dashed var(--add-btn-border);
   border-radius: 6px;
   cursor: pointer;
   font-size: 0.85em;
   width: 70%;
-  color: #888;
+  color: var(--add-btn-text);
   transition: all 0.2s;
 }
 
 .add-item-btn:hover {
-  border-color: #666;
-  color: #ccc;
-  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--add-btn-hover-border);
+  color: var(--add-btn-hover-text);
+  background: var(--item-hover-bg);
 }
 
 .item-toggle {
@@ -244,13 +280,13 @@ body {
 
 .title:hover,
 .item-title:hover {
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: var(--item-hover-bg);
 }
 
 .title:focus,
 .item-title:focus {
-  background-color: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 0 0 1px #555;
+  background-color: var(--input-focus-bg);
+  box-shadow: 0 0 0 1px var(--input-focus-shadow);
 }
 
 .card-header .title {
@@ -265,7 +301,7 @@ body {
   align-items: center;
   gap: 6px;
   font-size: 0.8em;
-  color: #888;
+  color: var(--add-btn-text);
 }
 
 .circular-progress {
@@ -283,7 +319,7 @@ body {
 }
 
 .circular-progress .bg {
-  stroke: #333;
+  stroke: var(--progress-bg);
 }
 
 .circular-progress .fg {
@@ -297,7 +333,7 @@ body {
   position: absolute;
   width: 8px;
   height: 8px;
-  background-color: white;
+  background-color: var(--port-bg);
   border-radius: 50%;
   right: -4px;
   top: 50%;
@@ -308,7 +344,7 @@ body {
   position: absolute;
   width: 8px;
   height: 8px;
-  background-color: white;
+  background-color: var(--port-bg);
   border-radius: 50%;
   right: -24px;
 }
@@ -317,7 +353,7 @@ body {
   position: absolute;
   width: 8px;
   height: 8px;
-  background-color: white;
+  background-color: var(--port-bg);
   border-radius: 50%;
   left: -4px;
   top: 50%;
@@ -334,5 +370,5 @@ body {
 }
 
 .card:not(.dragging-card):hover {
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 6px 12px var(--card-shadow);
 }
