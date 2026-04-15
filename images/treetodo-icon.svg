@@ -1,0 +1,13 @@
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Connections -->
+  <path d="M6 8C8 8 8 4 10 4" stroke="#4CAF50" stroke-width="1" fill="none" />
+  <path d="M6 8C8 8 8 12 10 12" stroke="#555555" stroke-width="1" fill="none" />
+  
+  <!-- Nodes -->
+  <rect x="2.5" y="6.5" width="3" height="3" rx="1" fill="#1e1e1e" stroke="#555555" stroke-width="1" />
+  <rect x="10.5" y="2.5" width="3" height="3" rx="1" fill="#4CAF50" />
+  <rect x="10.5" y="10.5" width="3" height="3" rx="1" fill="#1e1e1e" stroke="#555555" stroke-width="1" />
+  
+  <!-- Checkmark for the green node -->
+  <path d="M11 4L11.5 4.5L12.5 3.5" stroke="white" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round" />
+</svg>

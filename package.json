@@ -3,7 +3,7 @@
   "displayName": "Tree Todo List",
   "description": "A simple extension for managing Todo items as a tree view",
   "private": true,
-  "version": "0.0.3",
+  "version": "0.1.0",
   "license": "GPL-3.0",
   "publisher": "RaphKa02",
   "keywords": [
@@ -27,6 +27,9 @@
     "ui",
     "workspace"
   ],
+	"repository": {
+		"url": "https://github.com/RaphKa02/tree-todo-list.git"
+	},
   "type": "module",
   "engines": {
     "vscode": "^1.80.0"
@@ -39,6 +42,22 @@
     }
   },
   "contributes": {
+    "languages": [
+      {
+        "id": "treetodo",
+        "aliases": [
+          "Tree Todo",
+          "treetodo"
+        ],
+        "extensions": [
+          ".treetodo"
+        ],
+        "icon": {
+          "light": "images/treetodo-icon.svg",
+          "dark": "images/treetodo-icon.svg"
+        }
+      }
+    ],
     "customEditors": [
       {
         "viewType": "tree-todo-list.editor",
@@ -54,20 +73,20 @@
     "commands": [
       {
         "command": "tree-todo-list.newTreeTodo",
-        "title": "New Tree ToDo List",
-        "category": "TreeToDo"
+        "title": "New Tree Todo List",
+        "category": "TreeTodo"
       },
       {
         "command": "tree-todo-list.viewSource",
         "title": "View Source",
         "icon": "$(code)",
-        "category": "TreeToDo"
+        "category": "TreeTodo"
       },
       {
         "command": "tree-todo-list.viewCustomEditor",
         "title": "Open Editor",
         "icon": "$(preview)",
-        "category": "TreeToDo"
+        "category": "TreeTodo"
       }
     ],
     "menus": {
@@ -85,7 +104,7 @@
       ]
     },
     "configuration": {
-      "title": "Tree ToDo List",
+      "title": "Tree Todo List",
       "properties": {
         "tree-todo-list.maxPasses": {
           "type": "integer",

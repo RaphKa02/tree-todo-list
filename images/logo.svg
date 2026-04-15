@@ -1,0 +1,15 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Connections -->
+  <path d="M48 64C64 64 64 32 80 32" stroke="#4CAF50" stroke-width="6" fill="none" />
+  <path d="M48 64C64 64 64 96 80 96" stroke="#555555" stroke-width="6" fill="none" />
+  
+  <!-- Root Node (Left) -->
+  <rect x="16" y="48" width="32" height="32" rx="6" fill="#1e1e1e" stroke="#555555" stroke-width="4" />
+  
+  <!-- Top Right Node (Completed Green) -->
+  <rect x="80" y="16" width="32" height="32" rx="6" fill="#4CAF50" />
+  <path d="M88 32L93 37L103 27" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+  
+  <!-- Bottom Right Node (Incomplete) -->
+  <rect x="80" y="80" width="32" height="32" rx="6" fill="#1e1e1e" stroke="#555555" stroke-width="4" />
+</svg>

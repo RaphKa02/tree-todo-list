@@ -16,7 +16,7 @@ export class TreeTodoEditorProvider implements vscode.CustomTextEditorProvider {
         const workspaceFolders = vscode.workspace.workspaceFolders;
         if (!workspaceFolders) {
           vscode.window.showErrorMessage(
-            'Creating a new Tree ToDo file requires a workspace to be open.'
+            'Creating a new Tree Todo file requires a workspace to be open.'
           );
           return;
         }
