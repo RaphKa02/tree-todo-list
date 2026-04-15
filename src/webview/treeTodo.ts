@@ -186,7 +186,16 @@ declare function acquireVsCodeApi(): VsCodeApi;
           globalAutoReorderTasks = config.autoReorderTasks;
         }
         if (text) {
-          state = JSON.parse(text);
+          try {
+            state = JSON.parse(text);
+          } catch (e) {
+            vscode.postMessage({
+              type: 'error',
+              message:
+                'Failed to parse .treetodo file. Please check for syntax errors in the source view.',
+            });
+            return;
+          }
         } else {
           state = { tasks: [] };
         }
@@ -431,7 +440,7 @@ declare function acquireVsCodeApi(): VsCodeApi;
   }
 
   function generateId() {
-    return Math.random().toString(36).substr(2, 9);
+    return crypto.randomUUID();
   }
 
   function deleteTaskRecursive(taskId: string) {

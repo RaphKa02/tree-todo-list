@@ -140,6 +140,9 @@ export class TreeTodoEditorProvider implements vscode.CustomTextEditorProvider {
         case 'update':
           this.updateTextDocument(document, e.state);
           return;
+        case 'error':
+          vscode.window.showErrorMessage(e.message);
+          return;
       }
     });
 
@@ -183,13 +186,18 @@ export class TreeTodoEditorProvider implements vscode.CustomTextEditorProvider {
 </html>`;
   }
 
-  private updateTextDocument(document: vscode.TextDocument, json: AppState) {
+  private async updateTextDocument(document: vscode.TextDocument, json: AppState) {
     const edit = new vscode.WorkspaceEdit();
-    edit.replace(
-      document.uri,
-      new vscode.Range(0, 0, document.lineCount, 0),
-      JSON.stringify(json, null, 2)
+    const fullRange = new vscode.Range(
+      document.positionAt(0),
+      document.positionAt(document.getText().length)
     );
-    return vscode.workspace.applyEdit(edit);
+    edit.replace(document.uri, fullRange, JSON.stringify(json, null, 2));
+    const success = await vscode.workspace.applyEdit(edit);
+    if (!success) {
+      vscode.window.showErrorMessage(
+        'Failed to update the document. The file might be read-only or locked by another process.'
+      );
+    }
   }
 }
