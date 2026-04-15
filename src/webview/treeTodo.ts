@@ -21,7 +21,7 @@ declare function acquireVsCodeApi(): VsCodeApi;
     fit: `<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2v4h1V3h3V2H2zm0 12h4v-1H3v-3H2v4zm12 0v-4h-1v3h-3v1h4zm0-12h-4v1h3v3h1V2zM8 4.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7zM8 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/></svg>`,
     alignTop: `<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M1 1h14v1H1V1zm2 3h10v10H3V4zm1 1v8h8V5H4z"/></svg>`,
     alignCenter: `<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M1 7.5h14v1H1v-1zM3 2h10v4H3V2zm1 1v2h8V3H4zm0 10h8v-2H4v2zm-1-3h10v4H3v-4z"/></svg>`,
-    alignFree: `<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l2 5h5l-4 3 1.5 5-4.5-3-4.5 3 1.5-5-4-3h5l2-5z"/></svg>`
+    alignFree: `<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l2 5h5l-4 3 1.5 5-4.5-3-4.5 3 1.5-5-4-3h5l2-5z"/></svg>`,
   };
 
   const toolbar = document.createElement('div');
@@ -36,7 +36,7 @@ declare function acquireVsCodeApi(): VsCodeApi;
     const newTask: Task = {
       id: newId,
       title: 'New Root Task',
-      items: []
+      items: [],
     };
     if (state.settings?.alignment === 'free') {
       newTask.x = (window.innerWidth / 2 - offset.x) / scale - 125;
@@ -63,7 +63,7 @@ declare function acquireVsCodeApi(): VsCodeApi;
     const nextMode = modes[(modes.indexOf(currentMode) + 1) % modes.length];
 
     if (nextMode === 'free') {
-      state.tasks.forEach(task => {
+      state.tasks.forEach((task) => {
         if (task.x === undefined || task.y === undefined) {
           const card = document.getElementById(`card-${task.id}`);
           if (card) {
@@ -103,27 +103,31 @@ declare function acquireVsCodeApi(): VsCodeApi;
     render();
   }
 
-  window.addEventListener('wheel', (e) => {
-    if (e.ctrlKey || e.metaKey) {
-      e.preventDefault();
-      const delta = -e.deltaY;
-      const factor = 1.1;
-      const newScale = delta > 0 ? scale * factor : scale / factor;
+  window.addEventListener(
+    'wheel',
+    (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        const delta = -e.deltaY;
+        const factor = 1.1;
+        const newScale = delta > 0 ? scale * factor : scale / factor;
 
-      if (newScale > 0.1 && newScale < 5) {
-        const mouseX = e.clientX;
-        const mouseY = e.clientY;
-        offset.x = mouseX - (mouseX - offset.x) * (newScale / scale);
-        offset.y = mouseY - (mouseY - offset.y) * (newScale / scale);
-        scale = newScale;
+        if (newScale > 0.1 && newScale < 5) {
+          const mouseX = e.clientX;
+          const mouseY = e.clientY;
+          offset.x = mouseX - (mouseX - offset.x) * (newScale / scale);
+          offset.y = mouseY - (mouseY - offset.y) * (newScale / scale);
+          scale = newScale;
+          render();
+        }
+      } else if (!e.shiftKey) {
+        offset.x -= e.deltaX;
+        offset.y -= e.deltaY;
         render();
       }
-    } else if (!e.shiftKey) {
-      offset.x -= e.deltaX;
-      offset.y -= e.deltaY;
-      render();
-    }
-  }, { passive: false });
+    },
+    { passive: false }
+  );
 
   window.addEventListener('mousedown', (e) => {
     const activeEl = document.activeElement as HTMLElement;
@@ -133,7 +137,11 @@ declare function acquireVsCodeApi(): VsCodeApi;
       }
     }
 
-    if (e.button === 1 || (e.button === 0 && (e.altKey || e.target === container || e.target === document.body || e.target === app))) {
+    if (
+      e.button === 1 ||
+      (e.button === 0 &&
+        (e.altKey || e.target === container || e.target === document.body || e.target === app))
+    ) {
       isPanning = true;
       startPan = { x: e.clientX - offset.x, y: e.clientY - offset.y };
       document.body.style.cursor = 'grabbing';
@@ -156,14 +164,18 @@ declare function acquireVsCodeApi(): VsCodeApi;
     }
   });
 
-  window.addEventListener('message', event => {
-    const { type, text, config }: {
-      type: string,
-      text: string,
+  window.addEventListener('message', (event) => {
+    const {
+      type,
+      text,
+      config,
+    }: {
+      type: string;
+      text: string;
       config: {
-        maxPasses: number,
-        autoReorderTasks: boolean
-      }
+        maxPasses: number;
+        autoReorderTasks: boolean;
+      };
     } = event.data;
     switch (type) {
       case 'update':
@@ -190,10 +202,10 @@ declare function acquireVsCodeApi(): VsCodeApi;
     const maxPasses = Math.max(1, globalMaxPasses);
     for (let pass = 0; pass < maxPasses; pass++) {
       let changed = false;
-      state.tasks.forEach(task => {
-        task.items.forEach(item => {
+      state.tasks.forEach((task) => {
+        task.items.forEach((item) => {
           if (item.linksTo) {
-            const linkedTask = state.tasks.find(t => t.id === item.linksTo);
+            const linkedTask = state.tasks.find((t) => t.id === item.linksTo);
             if (linkedTask) {
               if (item.title !== linkedTask.title) {
                 item.title = linkedTask.title;
@@ -226,10 +238,10 @@ declare function acquireVsCodeApi(): VsCodeApi;
     function visit(taskId: string) {
       if (visited.has(taskId)) return;
       visited.add(taskId);
-      const task = state.tasks.find(t => t.id === taskId);
+      const task = state.tasks.find((t) => t.id === taskId);
       if (task) {
         orderedTasks.push(task);
-        task.items.forEach(item => {
+        task.items.forEach((item) => {
           if (item.linksTo) {
             visit(item.linksTo);
           }
@@ -238,17 +250,15 @@ declare function acquireVsCodeApi(): VsCodeApi;
     }
 
     const allTargetIds = new Set<string>();
-    state.tasks.forEach(t => t.items.forEach(i => i.linksTo && allTargetIds.add(i.linksTo)));
+    state.tasks.forEach((t) => t.items.forEach((i) => i.linksTo && allTargetIds.add(i.linksTo)));
 
-    // Find roots based on current order in state.tasks
-    state.tasks.forEach(task => {
+    state.tasks.forEach((task) => {
       if (!allTargetIds.has(task.id)) {
         visit(task.id);
       }
     });
 
-    // Handle any orphaned tasks or circular references
-    state.tasks.forEach(task => {
+    state.tasks.forEach((task) => {
       if (!visited.has(task.id)) {
         visit(task.id);
       }
@@ -259,7 +269,7 @@ declare function acquireVsCodeApi(): VsCodeApi;
 
   function calculateCompletion(task: Task): number {
     if (!task.items || task.items.length === 0) return 0;
-    const completedCount = task.items.filter(item => item.completed).length;
+    const completedCount = task.items.filter((item) => item.completed).length;
     return Math.round((completedCount / task.items.length) * 100);
   }
 
@@ -270,9 +280,9 @@ declare function acquireVsCodeApi(): VsCodeApi;
       const currentDepth = depths.get(taskId) ?? -1;
       if (depth > currentDepth) {
         depths.set(taskId, depth);
-        const task = state.tasks.find(t => t.id === taskId);
+        const task = state.tasks.find((t) => t.id === taskId);
         if (task) {
-          task.items.forEach(item => {
+          task.items.forEach((item) => {
             if (item.linksTo) {
               setDepth(item.linksTo, depth + 1);
             }
@@ -282,9 +292,9 @@ declare function acquireVsCodeApi(): VsCodeApi;
     }
 
     const allTargetIds = new Set<string>();
-    state.tasks.forEach(t => t.items.forEach(i => i.linksTo && allTargetIds.add(i.linksTo)));
+    state.tasks.forEach((t) => t.items.forEach((i) => i.linksTo && allTargetIds.add(i.linksTo)));
 
-    state.tasks.forEach(task => {
+    state.tasks.forEach((task) => {
       if (!allTargetIds.has(task.id)) {
         setDepth(task.id, 0);
       }
@@ -298,7 +308,8 @@ declare function acquireVsCodeApi(): VsCodeApi;
     try {
       const activeEl = document.activeElement as HTMLElement;
       let activeId = activeEl ? activeEl.id : null;
-      let selectionStart = (activeEl instanceof HTMLDivElement) ? window.getSelection()?.anchorOffset : null;
+      let selectionStart =
+        activeEl instanceof HTMLDivElement ? window.getSelection()?.anchorOffset : null;
 
       if (pendingFocusId) {
         activeId = pendingFocusId;
@@ -336,7 +347,7 @@ declare function acquireVsCodeApi(): VsCodeApi;
           container.appendChild(colDiv);
         }
 
-        state.tasks.forEach(task => {
+        state.tasks.forEach((task) => {
           const depth = depths.get(task.id) ?? 0;
           const card = createCard(task);
           if (columns[depth]) {
@@ -344,7 +355,7 @@ declare function acquireVsCodeApi(): VsCodeApi;
           }
         });
       } else {
-        state.tasks.forEach(task => {
+        state.tasks.forEach((task) => {
           const card = createCard(task);
           card.style.position = 'absolute';
           card.style.left = `${task.x || 0}px`;
@@ -395,8 +406,11 @@ declare function acquireVsCodeApi(): VsCodeApi;
     const cards = document.querySelectorAll('.card');
     if (cards.length === 0) return;
 
-    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-    cards.forEach(card => {
+    let minX = Infinity,
+      minY = Infinity,
+      maxX = -Infinity,
+      maxY = -Infinity;
+    cards.forEach((card) => {
       const rect = card.getBoundingClientRect();
       const x = (rect.left - offset.x) / scale;
       const y = (rect.top - offset.y) / scale;
@@ -407,8 +421,8 @@ declare function acquireVsCodeApi(): VsCodeApi;
     });
 
     const padding = 100;
-    const contentW = (maxX - minX) + padding * 2;
-    const contentH = (maxY - minY) + padding * 2;
+    const contentW = maxX - minX + padding * 2;
+    const contentH = maxY - minY + padding * 2;
     const newScale = Math.min(window.innerWidth / contentW, window.innerHeight / contentH, 1.0);
     scale = Math.max(0.2, newScale);
     offset.x = (window.innerWidth - (maxX - minX) * scale) / 2 - minX * scale;
@@ -421,24 +435,24 @@ declare function acquireVsCodeApi(): VsCodeApi;
   }
 
   function deleteTaskRecursive(taskId: string) {
-    const taskToDelete = state.tasks.find(t => t.id === taskId);
+    const taskToDelete = state.tasks.find((t) => t.id === taskId);
     if (!taskToDelete) return;
 
     const linkedIds = taskToDelete.items
-      .filter(item => item.linksTo)
-      .map(item => item.linksTo as string);
+      .filter((item) => item.linksTo)
+      .map((item) => item.linksTo as string);
 
-    state.tasks = state.tasks.filter(t => t.id !== taskId);
+    state.tasks = state.tasks.filter((t) => t.id !== taskId);
 
-    state.tasks.forEach(t => {
-      t.items.forEach(item => {
+    state.tasks.forEach((t) => {
+      t.items.forEach((item) => {
         if (item.linksTo === taskId) {
           delete item.linksTo;
         }
       });
     });
 
-    linkedIds.forEach(id => deleteTaskRecursive(id));
+    linkedIds.forEach((id) => deleteTaskRecursive(id));
   }
 
   function createCard(task: Task): HTMLElement {
@@ -488,7 +502,7 @@ declare function acquireVsCodeApi(): VsCodeApi;
     header.appendChild(deleteBtn);
     card.appendChild(header);
 
-    if (Array.from(getTaskDepth().values()).some(d => d > 0)) {
+    if (Array.from(getTaskDepth().values()).some((d) => d > 0)) {
       const inPort = document.createElement('div');
       inPort.className = 'in-port';
       card.appendChild(inPort);
@@ -546,7 +560,7 @@ declare function acquireVsCodeApi(): VsCodeApi;
             task.items.push({
               id: newItemId,
               title: '',
-              completed: false
+              completed: false,
             });
             pendingFocusId = `item-title-${task.id}-${newItemId}`;
             updateState();
@@ -578,7 +592,7 @@ declare function acquireVsCodeApi(): VsCodeApi;
           const newTask: Task = {
             id: newTaskId,
             title: item.title,
-            items: []
+            items: [],
           };
           if (state.settings?.alignment === 'free') {
             const cardRect = card.getBoundingClientRect();
@@ -613,8 +627,8 @@ declare function acquireVsCodeApi(): VsCodeApi;
       }
 
       let isItemHandleDragging = false;
-      itemHandle.onmousedown = () => isItemHandleDragging = true;
-      itemHandle.onmouseup = () => isItemHandleDragging = false;
+      itemHandle.onmousedown = () => (isItemHandleDragging = true);
+      itemHandle.onmouseup = () => (isItemHandleDragging = false);
 
       itemRow.ondragstart = (e) => {
         if (!isItemHandleDragging) {
@@ -622,7 +636,10 @@ declare function acquireVsCodeApi(): VsCodeApi;
           return;
         }
         e.stopPropagation();
-        e.dataTransfer?.setData('application/json', JSON.stringify({ type: 'item', taskId: task.id, index }));
+        e.dataTransfer?.setData(
+          'application/json',
+          JSON.stringify({ type: 'item', taskId: task.id, index })
+        );
         itemRow.classList.add('dragging');
       };
       itemRow.ondragend = () => {
@@ -661,7 +678,7 @@ declare function acquireVsCodeApi(): VsCodeApi;
       task.items.push({
         id: newItemId,
         title: '',
-        completed: false
+        completed: false,
       });
       pendingFocusId = `item-title-${task.id}-${newItemId}`;
       updateState();
@@ -735,8 +752,8 @@ declare function acquireVsCodeApi(): VsCodeApi;
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
     ctx.lineWidth = 2;
 
-    state.tasks.forEach(task => {
-      task.items.forEach(item => {
+    state.tasks.forEach((task) => {
+      task.items.forEach((item) => {
         if (item.linksTo) {
           const fromPort = document.getElementById(`port-${task.id}-${item.id}`);
           const toCard = document.getElementById(`card-${item.linksTo}`);
@@ -783,5 +800,4 @@ declare function acquireVsCodeApi(): VsCodeApi;
   container.addEventListener('scroll', () => {
     requestAnimationFrame(drawConnections);
   });
-
 })();

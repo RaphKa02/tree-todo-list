@@ -3,68 +3,91 @@ import { getNonce } from './util.js';
 import { AppState } from './types.js';
 
 export class TreeTodoEditorProvider implements vscode.CustomTextEditorProvider {
-
   public static register(context: vscode.ExtensionContext): vscode.Disposable {
     const provider = new TreeTodoEditorProvider(context);
-    const providerRegistration = vscode.window.registerCustomEditorProvider(TreeTodoEditorProvider.viewType, provider);
+    const providerRegistration = vscode.window.registerCustomEditorProvider(
+      TreeTodoEditorProvider.viewType,
+      provider
+    );
 
-    const commandRegistration = vscode.commands.registerCommand('tree-todo-list.newTreeTodo', () => {
-      const workspaceFolders = vscode.workspace.workspaceFolders;
-      if (!workspaceFolders) {
-        vscode.window.showErrorMessage('Creating a new Tree ToDo file requires a workspace to be open.');
-        return;
-      }
+    const commandRegistration = vscode.commands.registerCommand(
+      'tree-todo-list.newTreeTodo',
+      () => {
+        const workspaceFolders = vscode.workspace.workspaceFolders;
+        if (!workspaceFolders) {
+          vscode.window.showErrorMessage(
+            'Creating a new Tree ToDo file requires a workspace to be open.'
+          );
+          return;
+        }
 
-      const uri = vscode.Uri.joinPath(workspaceFolders[0].uri, `new-todo-${getNonce()}.treetodo`);
-      const initialState = {
-        tasks: [
-          {
-            id: 'root-1',
-            title: 'My Todo',
-            items: [
-              { id: 'item-1', title: 'Task 1', completed: false },
-              { id: 'item-2', title: 'Task 2', completed: false }
-            ]
-          }
-        ]
-      };
+        const uri = vscode.Uri.joinPath(workspaceFolders[0].uri, `new-todo-${getNonce()}.treetodo`);
+        const initialState = {
+          tasks: [
+            {
+              id: 'root-1',
+              title: 'My Todo',
+              items: [
+                { id: 'item-1', title: 'Task 1', completed: false },
+                { id: 'item-2', title: 'Task 2', completed: false },
+              ],
+            },
+          ],
+        };
 
-      const content = JSON.stringify(initialState, null, 2);
-      const edit = new vscode.WorkspaceEdit();
-      edit.createFile(uri, { contents: Buffer.from(content) });
-      vscode.workspace.applyEdit(edit).then(() => {
-        vscode.commands.executeCommand('vscode.open', uri);
-      });
-    });
-
-    const viewSourceRegistration = vscode.commands.registerCommand('tree-todo-list.viewSource', (uri?: vscode.Uri) => {
-      const resource = uri || (vscode.window.tabGroups.activeTabGroup.activeTab?.input as any)?.uri;
-      if (resource) {
-        vscode.commands.executeCommand('vscode.openWith', resource, 'default', {
-          viewColumn: vscode.ViewColumn.Active,
-          preserveFocus: false
+        const content = JSON.stringify(initialState, null, 2);
+        const edit = new vscode.WorkspaceEdit();
+        edit.createFile(uri, { contents: Buffer.from(content) });
+        vscode.workspace.applyEdit(edit).then(() => {
+          vscode.commands.executeCommand('vscode.open', uri);
         });
       }
-    });
+    );
 
-    const viewCustomRegistration = vscode.commands.registerCommand('tree-todo-list.viewCustomEditor', (uri?: vscode.Uri) => {
-      const resource = uri || (vscode.window.tabGroups.activeTabGroup.activeTab?.input as any)?.uri;
-      if (resource) {
-        vscode.commands.executeCommand('vscode.openWith', resource, TreeTodoEditorProvider.viewType, {
-          viewColumn: vscode.ViewColumn.Active,
-          preserveFocus: false
-        });
+    const viewSourceRegistration = vscode.commands.registerCommand(
+      'tree-todo-list.viewSource',
+      (uri?: vscode.Uri) => {
+        const resource =
+          uri || (vscode.window.tabGroups.activeTabGroup.activeTab?.input as any)?.uri;
+        if (resource) {
+          vscode.commands.executeCommand('vscode.openWith', resource, 'default', {
+            viewColumn: vscode.ViewColumn.Active,
+            preserveFocus: false,
+          });
+        }
       }
-    });
+    );
 
-    return vscode.Disposable.from(providerRegistration, commandRegistration, viewSourceRegistration, viewCustomRegistration);
+    const viewCustomRegistration = vscode.commands.registerCommand(
+      'tree-todo-list.viewCustomEditor',
+      (uri?: vscode.Uri) => {
+        const resource =
+          uri || (vscode.window.tabGroups.activeTabGroup.activeTab?.input as any)?.uri;
+        if (resource) {
+          vscode.commands.executeCommand(
+            'vscode.openWith',
+            resource,
+            TreeTodoEditorProvider.viewType,
+            {
+              viewColumn: vscode.ViewColumn.Active,
+              preserveFocus: false,
+            }
+          );
+        }
+      }
+    );
+
+    return vscode.Disposable.from(
+      providerRegistration,
+      commandRegistration,
+      viewSourceRegistration,
+      viewCustomRegistration
+    );
   }
 
   private static readonly viewType = 'tree-todo-list.editor';
 
-  constructor(
-    private readonly context: vscode.ExtensionContext
-  ) { }
+  constructor(private readonly context: vscode.ExtensionContext) {}
 
   public async resolveCustomTextEditor(
     document: vscode.TextDocument,
@@ -85,17 +108,20 @@ export class TreeTodoEditorProvider implements vscode.CustomTextEditorProvider {
         text: document.getText(),
         config: {
           maxPasses: maxPasses,
-          autoReorderTasks: autoReorder
-        }
+          autoReorderTasks: autoReorder,
+        },
       });
     }
 
-    const changeConfigurationSubscription = vscode.workspace.onDidChangeConfiguration(e => {
-      if (e.affectsConfiguration('tree-todo-list.maxPasses') || e.affectsConfiguration('tree-todo-list.autoReorderTasks')) {
+    const changeConfigurationSubscription = vscode.workspace.onDidChangeConfiguration((e) => {
+      if (
+        e.affectsConfiguration('tree-todo-list.maxPasses') ||
+        e.affectsConfiguration('tree-todo-list.autoReorderTasks')
+      ) {
         updateWebview();
       }
     });
-    const changeDocumentSubscription = vscode.workspace.onDidChangeTextDocument(e => {
+    const changeDocumentSubscription = vscode.workspace.onDidChangeTextDocument((e) => {
       if (e.document.uri.toString() === document.uri.toString()) {
         updateWebview();
       }
@@ -106,7 +132,7 @@ export class TreeTodoEditorProvider implements vscode.CustomTextEditorProvider {
       changeConfigurationSubscription.dispose();
     });
 
-    webviewPanel.webview.onDidReceiveMessage(e => {
+    webviewPanel.webview.onDidReceiveMessage((e) => {
       switch (e.type) {
         case 'ready':
           updateWebview();
@@ -117,7 +143,7 @@ export class TreeTodoEditorProvider implements vscode.CustomTextEditorProvider {
       }
     });
 
-    webviewPanel.onDidChangeViewState(e => {
+    webviewPanel.onDidChangeViewState((e) => {
       if (e.webviewPanel.visible) {
         updateWebview();
       }
@@ -127,15 +153,17 @@ export class TreeTodoEditorProvider implements vscode.CustomTextEditorProvider {
   }
 
   private getHtmlForWebview(webview: vscode.Webview): string {
-    const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(
-      this.context.extensionUri, 'dist', 'webview', 'treeTodo.js'));
+    const scriptUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(this.context.extensionUri, 'dist', 'webview', 'treeTodo.js')
+    );
 
-    const styleMainUri = webview.asWebviewUri(vscode.Uri.joinPath(
-      this.context.extensionUri, 'media', 'treeTodo.css'));
+    const styleMainUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(this.context.extensionUri, 'media', 'treeTodo.css')
+    );
 
     const nonce = getNonce();
 
-    return /* html */`
+    return `
 			<!DOCTYPE html>
 			<html lang="en">
 			<head>
@@ -160,7 +188,8 @@ export class TreeTodoEditorProvider implements vscode.CustomTextEditorProvider {
     edit.replace(
       document.uri,
       new vscode.Range(0, 0, document.lineCount, 0),
-      JSON.stringify(json, null, 2));
+      JSON.stringify(json, null, 2)
+    );
     return vscode.workspace.applyEdit(edit);
   }
 }
