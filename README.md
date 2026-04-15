@@ -43,5 +43,4 @@ With this extension you can create todo lists in a tree-like structure where tas
 
 ## Known Issues
 
-- **Autosave Conflict**: Using [Files: Auto Save](vscode://settings/files.autoSave) with a short delay can cause text inputs to lose focus or reset if you type slowly. It is recommended to use `onFocusChange` or `onWindowChange`.
-
+- **Autosave Conflict**: Using [Files: Auto Save](vscode://settings/files.autoSave) with a short delay can cause text inputs to lose focus or reset if you type directly after adding an item.

@@ -27,9 +27,9 @@
     "ui",
     "workspace"
   ],
-	"repository": {
-		"url": "https://github.com/RaphKa02/tree-todo-list.git"
-	},
+  "repository": {
+    "url": "https://github.com/RaphKa02/tree-todo-list.git"
+  },
   "type": "module",
   "engines": {
     "vscode": "^1.80.0"
@@ -74,6 +74,11 @@
       {
         "command": "tree-todo-list.newTreeTodo",
         "title": "New Tree Todo List",
+        "category": "TreeTodo"
+      },
+      {
+        "command": "tree-todo-list.importJson",
+        "title": "Import JSON from treetodolist.com",
         "category": "TreeTodo"
       },
       {

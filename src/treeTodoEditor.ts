@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { getNonce } from './util.js';
+import { getNonce, convertJSON } from './util.js';
 import { AppState } from './types.js';
 
 export class TreeTodoEditorProvider implements vscode.CustomTextEditorProvider {
@@ -7,12 +7,19 @@ export class TreeTodoEditorProvider implements vscode.CustomTextEditorProvider {
     const provider = new TreeTodoEditorProvider(context);
     const providerRegistration = vscode.window.registerCustomEditorProvider(
       TreeTodoEditorProvider.viewType,
-      provider
+      provider,
+      {
+        supportsMultipleEditorsPerDocument: false,
+        webviewOptions: {
+          retainContextWhenHidden: true,
+          enableFindWidget: true,
+        },
+      }
     );
 
     const commandRegistration = vscode.commands.registerCommand(
       'tree-todo-list.newTreeTodo',
-      () => {
+      async () => {
         const workspaceFolders = vscode.workspace.workspaceFolders;
         if (!workspaceFolders) {
           vscode.window.showErrorMessage(
@@ -21,16 +28,40 @@ export class TreeTodoEditorProvider implements vscode.CustomTextEditorProvider {
           return;
         }
 
-        const uri = vscode.Uri.joinPath(workspaceFolders[0].uri, `new-todo-${getNonce()}.treetodo`);
+        const fileName = await vscode.window.showInputBox({
+          prompt: 'Enter a name for your new Todo list',
+          placeHolder: 'my-tasks',
+          validateInput: (text) => {
+            if (!text || text.trim().length === 0) {
+              return 'Filename cannot be empty';
+            }
+            if (/[<>:"/\\|?*]/.test(text)) {
+              return 'Filename contains invalid characters';
+            }
+            return null;
+          },
+        });
+
+        if (!fileName) {
+          return;
+        }
+
+        const uri = vscode.Uri.joinPath(workspaceFolders[0].uri, `${fileName}.treetodo`);
+
+        try {
+          await vscode.workspace.fs.stat(uri);
+          vscode.window.showErrorMessage(`A file named ${fileName}.treetodo already exists.`);
+          return;
+        } catch {
+          // File does not exist, proceed
+        }
+
         const initialState = {
           tasks: [
             {
               id: 'root-1',
-              title: 'My Todo',
-              items: [
-                { id: 'item-1', title: 'Task 1', completed: false },
-                { id: 'item-2', title: 'Task 2', completed: false },
-              ],
+              title: fileName,
+              items: [{ id: 'item-1', title: 'Task 1', completed: false }],
             },
           ],
         };
@@ -38,9 +69,33 @@ export class TreeTodoEditorProvider implements vscode.CustomTextEditorProvider {
         const content = JSON.stringify(initialState, null, 2);
         const edit = new vscode.WorkspaceEdit();
         edit.createFile(uri, { contents: Buffer.from(content) });
-        vscode.workspace.applyEdit(edit).then(() => {
-          vscode.commands.executeCommand('vscode.open', uri);
+        await vscode.workspace.applyEdit(edit);
+        vscode.commands.executeCommand('vscode.open', uri);
+      }
+    );
+
+    const importJsonRegistration = vscode.commands.registerCommand(
+      'tree-todo-list.importJson',
+      async () => {
+        const uris = await vscode.window.showOpenDialog({
+          canSelectMany: false,
+          filters: {
+            JSON: ['json'],
+          },
+          title: 'Select a JSON file exported from treetodolist.com',
         });
+
+        if (uris && uris[0]) {
+          try {
+            const content = await vscode.workspace.fs.readFile(uris[0]);
+            const imported = JSON.parse(content.toString());
+            const convertedState = convertJSON(imported);
+            const filename = imported.workflow?.title || 'imported-todo';
+            await provider.createNewTreeTodo(convertedState, filename);
+          } catch (err) {
+            vscode.window.showErrorMessage('Failed to parse or import JSON file.');
+          }
+        }
       }
     );
 
@@ -80,6 +135,7 @@ export class TreeTodoEditorProvider implements vscode.CustomTextEditorProvider {
     return vscode.Disposable.from(
       providerRegistration,
       commandRegistration,
+      importJsonRegistration,
       viewSourceRegistration,
       viewCustomRegistration
     );
@@ -140,6 +196,9 @@ export class TreeTodoEditorProvider implements vscode.CustomTextEditorProvider {
         case 'update':
           this.updateTextDocument(document, e.state);
           return;
+        case 'import':
+          this.updateTextDocument(document, e.state);
+          return;
         case 'error':
           vscode.window.showErrorMessage(e.message);
           return;
@@ -153,6 +212,22 @@ export class TreeTodoEditorProvider implements vscode.CustomTextEditorProvider {
     });
 
     updateWebview();
+  }
+
+  private async createNewTreeTodo(state: AppState, filename: string) {
+    const workspaceFolders = vscode.workspace.workspaceFolders;
+    if (!workspaceFolders) {
+      vscode.window.showErrorMessage('Importing a Tree Todo file requires a workspace to be open.');
+      return;
+    }
+
+    const cleanFilename = filename.replace(/[<>:"/\\|?*]/g, '_');
+    const uri = vscode.Uri.joinPath(workspaceFolders[0].uri, `${cleanFilename}.treetodo`);
+    const content = JSON.stringify(state, null, 2);
+    const edit = new vscode.WorkspaceEdit();
+    edit.createFile(uri, { contents: Buffer.from(content), overwrite: true });
+    await vscode.workspace.applyEdit(edit);
+    await vscode.commands.executeCommand('vscode.open', uri);
   }
 
   private getHtmlForWebview(webview: vscode.Webview): string {

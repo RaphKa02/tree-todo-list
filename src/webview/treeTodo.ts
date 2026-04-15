@@ -1,4 +1,5 @@
 import { AppState, Task } from '../types.js';
+import { convertJSON } from '../util.js';
 
 interface VsCodeApi {
   postMessage(message: any): void;
@@ -17,11 +18,12 @@ declare function acquireVsCodeApi(): VsCodeApi;
   const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 
   const icons = {
-    add: `<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M14 7H9V2H7v5H2v2h5v5h2V9h5V7z"/></svg>`,
-    fit: `<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2v4h1V3h3V2H2zm0 12h4v-1H3v-3H2v4zm12 0v-4h-1v3h-3v1h4zm0-12h-4v1h3v3h1V2zM8 4.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7zM8 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/></svg>`,
-    alignTop: `<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M1 1h14v1H1V1zm2 3h10v10H3V4zm1 1v8h8V5H4z"/></svg>`,
-    alignCenter: `<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M1 7.5h14v1H1v-1zM3 2h10v4H3V2zm1 1v2h8V3H4zm0 10h8v-2H4v2zm-1-3h10v4H3v-4z"/></svg>`,
-    alignFree: `<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l2 5h5l-4 3 1.5 5-4.5-3-4.5 3 1.5-5-4-3h5l2-5z"/></svg>`,
+    add: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-plus-icon lucide-square-plus"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>`,
+    fit: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-fullscreen-icon lucide-fullscreen"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><rect width="10" height="8" x="7" y="8" rx="1"/></svg>`,
+    alignTop: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-align-start-horizontal-icon lucide-align-start-horizontal"><rect width="6" height="16" x="4" y="6" rx="2"/><rect width="6" height="9" x="14" y="6" rx="2"/><path d="M22 2H2"/></svg>`,
+    alignCenter: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-align-center-horizontal-icon lucide-align-center-horizontal"><path d="M2 12h20"/><path d="M10 16v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-4"/><path d="M10 8V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v4"/><path d="M20 16v1a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2v-1"/><path d="M14 8V7c0-1.1.9-2 2-2h2a2 2 0 0 1 2 2v1"/></svg>`,
+    alignFree: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-move-icon lucide-move"><path d="M12 2v20"/><path d="m15 19-3 3-3-3"/><path d="m19 9 3 3-3 3"/><path d="M2 12h20"/><path d="m5 9-3 3 3 3"/><path d="m9 5 3-3 3 3"/></svg>`,
+    import: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-down-icon lucide-file-down"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="M12 18v-6"/><path d="m9 15 3 3 3-3"/></svg>`,
   };
 
   const toolbar = document.createElement('div');
@@ -51,7 +53,10 @@ declare function acquireVsCodeApi(): VsCodeApi;
   fitBtn.className = 'tool-btn';
   fitBtn.innerHTML = icons.fit;
   fitBtn.title = 'Fit to Screen';
-  fitBtn.onclick = () => fitToScreen();
+  fitBtn.onclick = () => {
+    fitToScreen();
+    vscode.setState({ state, viewState: { scale, offset } });
+  };
 
   const alignBtn = document.createElement('button');
   alignBtn.className = 'tool-btn';
@@ -82,9 +87,40 @@ declare function acquireVsCodeApi(): VsCodeApi;
     updateState();
   };
 
+  const importBtn = document.createElement('button');
+  importBtn.className = 'tool-btn';
+  importBtn.innerHTML = icons.import;
+  importBtn.title = 'Import JSON';
+
+  const fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.accept = '.json';
+  fileInput.style.display = 'none';
+  fileInput.onchange = (e) => {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const content = event.target?.result as string;
+        try {
+          const imported = JSON.parse(content);
+          const convertedState = convertJSON(imported);
+          const filename = imported.workflow?.title || 'imported-todo';
+          vscode.postMessage({ type: 'import', state: convertedState, filename });
+        } catch (err) {
+          vscode.postMessage({ type: 'error', message: 'Failed to parse imported JSON.' });
+        }
+      };
+      reader.readAsText(file);
+    }
+  };
+  document.body.appendChild(fileInput);
+  importBtn.onclick = () => fileInput.click();
+
   toolbar.appendChild(newRootBtn);
   toolbar.appendChild(fitBtn);
   toolbar.appendChild(alignBtn);
+  toolbar.appendChild(importBtn);
   app.appendChild(toolbar);
 
   let scale = 1;
@@ -95,11 +131,18 @@ declare function acquireVsCodeApi(): VsCodeApi;
   let isRendering = false;
   let globalMaxPasses = 10;
   let globalAutoReorderTasks = true;
+  let hasInitiallyFitted = false;
 
   const previousState = vscode.getState();
-  let state: AppState = previousState || { tasks: [] };
+  let state: AppState = previousState?.state || { tasks: [] };
 
-  if (previousState) {
+  if (previousState?.viewState) {
+    scale = previousState.viewState.scale;
+    offset = previousState.viewState.offset;
+    hasInitiallyFitted = true;
+  }
+
+  if (state.tasks.length > 0) {
     render();
   }
 
@@ -118,11 +161,13 @@ declare function acquireVsCodeApi(): VsCodeApi;
           offset.x = mouseX - (mouseX - offset.x) * (newScale / scale);
           offset.y = mouseY - (mouseY - offset.y) * (newScale / scale);
           scale = newScale;
+          vscode.setState({ state, viewState: { scale, offset } });
           render();
         }
       } else if (!e.shiftKey) {
         offset.x -= e.deltaX;
         offset.y -= e.deltaY;
+        vscode.setState({ state, viewState: { scale, offset } });
         render();
       }
     },
@@ -199,8 +244,13 @@ declare function acquireVsCodeApi(): VsCodeApi;
         } else {
           state = { tasks: [] };
         }
-        vscode.setState(state);
+        vscode.setState({ state, viewState: { scale, offset } });
         render();
+
+        if (!hasInitiallyFitted && state.tasks.length > 0) {
+          fitToScreen();
+          hasInitiallyFitted = true;
+        }
         break;
     }
   });
@@ -737,6 +787,7 @@ declare function acquireVsCodeApi(): VsCodeApi;
           isCardHandleDragging = false;
           window.removeEventListener('mousemove', onMouseMove);
           window.removeEventListener('mouseup', onMouseUp);
+          vscode.setState({ state, viewState: { scale, offset } });
           updateState();
         };
 
@@ -760,7 +811,8 @@ declare function acquireVsCodeApi(): VsCodeApi;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     const style = getComputedStyle(document.body);
-    const connectionColor = style.getPropertyValue('--connection-color').trim() || 'rgba(255, 255, 255, 0.4)';
+    const connectionColor =
+      style.getPropertyValue('--connection-color').trim() || 'rgba(255, 255, 255, 0.4)';
     const portColor = style.getPropertyValue('--port-bg').trim() || 'white';
 
     ctx.strokeStyle = connectionColor;
