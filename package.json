@@ -3,7 +3,7 @@
   "displayName": "Tree Todo List",
   "description": "A simple extension for managing Todo items as a tree view",
   "private": true,
-  "version": "0.0.2",
+  "version": "0.0.3",
   "license": "GPL-3.0",
   "publisher": "RaphKa02",
   "keywords": [
@@ -83,6 +83,21 @@
           "group": "navigation"
         }
       ]
+    },
+    "configuration": {
+      "title": "Tree ToDo List",
+      "properties": {
+        "tree-todo-list.maxPasses": {
+          "type": "integer",
+          "default": 10,
+          "description": "Maximum number of iterations to perform during state updates to resolve cascading changes."
+        },
+        "tree-todo-list.autoReorderTasks": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically reorder tasks to match the order of items in their parent tasks."
+        }
+      }
     }
   },
   "scripts": {

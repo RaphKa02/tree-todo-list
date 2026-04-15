@@ -5,40 +5,26 @@
       "title": "Project Roadmap",
       "items": [
         {
-          "id": "item-1",
-          "title": "Frontend Development",
-          "completed": false,
-          "linksTo": "task-frontend"
-        },
-        {
           "id": "item-2",
           "title": "Backend Services",
-          "completed": true,
+          "completed": false,
           "linksTo": "task-backend"
+        },
+        {
+          "id": "item-1",
+          "title": "Frontend Development",
+          "completed": true,
+          "linksTo": "task-frontend"
         },
         {
           "id": "item-3",
           "title": "Final Deployment",
-          "completed": false
-        }
-      ]
-    },
-    {
-      "id": "task-frontend",
-      "title": "Frontend Development",
-      "items": [
-        {
-          "id": "fe-1",
-          "title": "UI Components",
           "completed": false,
-          "linksTo": "task-ui"
-        },
-        {
-          "id": "fe-2",
-          "title": "State Management",
-          "completed": false
+          "linksTo": "task-zlaoweowe"
         }
-      ]
+      ],
+      "x": 44,
+      "y": 285
     },
     {
       "id": "task-backend",
@@ -52,25 +38,106 @@
         {
           "id": "be-2",
           "title": "API Auth",
-          "completed": true
+          "completed": false
+        },
+        {
+          "id": "item-kytxac6h5",
+          "title": "New Task",
+          "completed": false
         }
-      ]
+      ],
+      "x": 453,
+      "y": 85.5
+    },
+    {
+      "id": "task-frontend",
+      "title": "Frontend Development",
+      "items": [
+        {
+          "id": "fe-1",
+          "title": "UI Componensts",
+          "completed": true,
+          "linksTo": "task-ui"
+        },
+        {
+          "id": "fe-2",
+          "title": "State Management",
+          "completed": true,
+          "linksTo": "task-tf68vaz1b"
+        }
+      ],
+      "x": 448,
+      "y": 456.5
     },
     {
       "id": "task-ui",
-      "title": "UI Components",
+      "title": "UI Componensts",
       "items": [
+        {
+          "id": "item-1oeecpe6w",
+          "title": "New Task",
+          "completed": true
+        },
         {
           "id": "ui-1",
           "title": "Buttons & Inputs",
-          "completed": false
+          "completed": true
         },
         {
           "id": "ui-2",
           "title": "Canvas Renderer",
+          "completed": true
+        }
+      ],
+      "x": 840,
+      "y": 276
+    },
+    {
+      "id": "task-tf68vaz1b",
+      "title": "State Management",
+      "items": [
+        {
+          "id": "item-esxtt92tw",
+          "title": "Do stuff",
+          "completed": true
+        }
+      ],
+      "x": 840,
+      "y": 561
+    },
+    {
+      "id": "task-zlaoweowe",
+      "title": "Final Deployment",
+      "items": [
+        {
+          "id": "item-80uxig84v",
+          "title": "Deploy to Server",
+          "completed": false
+        },
+        {
+          "id": "item-wxiybsmqw",
+          "title": "Verify",
           "completed": false
         }
-      ]
+      ],
+      "x": 440,
+      "y": 697.5
+    },
+    {
+      "id": "task-lqftfcsj8",
+      "title": "New Root Task",
+      "items": [
+        {
+          "id": "item-ojkek15ta",
+          "title": "Stuff goes brrrr",
+          "completed": true
+        }
+      ],
+      "x": 40,
+      "y": 576
     }
-  ]
+  ],
+  "settings": {
+    "alignment": "center"
+  }
 }

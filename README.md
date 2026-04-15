@@ -23,6 +23,9 @@ With this extension you can create todo lists in a tree like structure, where to
 
 ## Extension Settings
 
+- `tree-todo-list.maxPasses`: Maximum number of iterations to perform during state updates to resolve cascading changes (default 10). If you have really deep nested todos you might need to increase the value to the number of levels you have.
+- `tree-todo-list.autoReorderTasks`: Automatically reorder tasks to match the order of items in their parent tasks. Does not apply in free edit mode!
+
 ## Known Issues
 
 - [Autosave after delay](vscode://settings/files.autoSave) can cause the text inputs to reset if you type too quickly.
