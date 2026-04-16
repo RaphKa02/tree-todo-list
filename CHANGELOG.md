@@ -1,5 +1,10 @@
 # Change Log
 
+## 0.2.0
+
+- **Import feature**: Import JSON files from [treetodolist.com](https://www.treetodolist.com/)
+- **Visual Improvements**: Completed items now have a line-through style
+
 ## 0.1.1
 
 - Change colors based on theme

@@ -25,6 +25,7 @@ With this extension you can create todo lists in a tree-like structure where tas
 ## Features
 
 - **Visual Tree Editor**: Manage tasks in a spatial, node-based layout.
+- **Import from [treetodolist.com](https://www.treetodolist.com/)**: Easily migrate your existing lists by importing their JSON export.
 - **Task Dependencies**: Link items to sub-tasks to create a clear progression path.
 - **Progress Tracking**: Automatic progress calculation for tasks based on their sub-items.
 - **Auto-Layout**: Tasks can be automatically reordered to maintain a clean structure.
@@ -33,6 +34,7 @@ With this extension you can create todo lists in a tree-like structure where tas
 ## Commands
 
 - `TreeTodo: New Tree Todo List`: Create a new file with an example task.
+- `TreeTodo: Import JSON from treetodolist.com`: Select a JSON file to import and create a new `.treetodo` file.
 - `TreeTodo: View Source`: View the raw JSON content of the `.treetodo` file.
 - `TreeTodo: Open Editor`: Switch back to the visual custom editor.
 
