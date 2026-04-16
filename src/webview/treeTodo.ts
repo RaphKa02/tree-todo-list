@@ -142,7 +142,7 @@ declare function acquireVsCodeApi(): VsCodeApi;
     hasInitiallyFitted = true;
   }
 
-  if (state.tasks.length > 0) {
+  if (state.tasks?.length > 0) {
     render();
   }
 
@@ -524,9 +524,6 @@ declare function acquireVsCodeApi(): VsCodeApi;
     const header = document.createElement('div');
     header.className = 'card-header';
 
-    const headerLeft = document.createElement('div');
-    headerLeft.className = 'card-header-left';
-
     const title = document.createElement('div');
     title.className = 'title';
     title.id = `title-${task.id}`;
@@ -546,8 +543,6 @@ declare function acquireVsCodeApi(): VsCodeApi;
       }
     };
 
-    headerLeft.appendChild(title);
-
     const deleteBtn = document.createElement('div');
     deleteBtn.className = 'delete-task-btn';
     deleteBtn.innerHTML = '✕';
@@ -557,7 +552,7 @@ declare function acquireVsCodeApi(): VsCodeApi;
       updateState();
     };
 
-    header.appendChild(headerLeft);
+    header.appendChild(title);
     header.appendChild(deleteBtn);
     card.appendChild(header);
 
@@ -641,12 +636,12 @@ declare function acquireVsCodeApi(): VsCodeApi;
       const actions = document.createElement('div');
       actions.className = 'item-actions';
 
-      const linkBtn = document.createElement('div');
-      linkBtn.className = 'action-btn';
-      linkBtn.innerHTML = '🔗';
-      linkBtn.title = item.linksTo ? 'Go to linked task' : 'Link to new task';
-      linkBtn.onclick = () => {
-        if (!item.linksTo) {
+      if (!item.linksTo) {
+        const linkBtn = document.createElement('div');
+        linkBtn.className = 'action-btn';
+        linkBtn.innerHTML = '🔗';
+        linkBtn.title = 'Link to new task';
+        linkBtn.onclick = () => {
           const newTaskId = `task-${generateId()}`;
           const newTask: Task = {
             id: newTaskId,
@@ -662,8 +657,9 @@ declare function acquireVsCodeApi(): VsCodeApi;
           item.linksTo = newTaskId;
           pendingFocusId = `title-${newTaskId}`;
           updateState();
-        }
-      };
+        };
+        actions.appendChild(linkBtn);
+      }
 
       const delItemBtn = document.createElement('div');
       delItemBtn.className = 'action-btn';
@@ -674,7 +670,6 @@ declare function acquireVsCodeApi(): VsCodeApi;
         updateState();
       };
 
-      actions.appendChild(linkBtn);
       actions.appendChild(delItemBtn);
       itemRow.appendChild(actions);
 
@@ -764,6 +759,17 @@ declare function acquireVsCodeApi(): VsCodeApi;
     let cardStartY = 0;
 
     card.onmousedown = (e) => {
+      const target = e.target as HTMLElement;
+      if (
+        target.isContentEditable ||
+        target.closest('.action-btn') ||
+        target.closest('.delete-task-btn') ||
+        target.closest('.add-item-btn') ||
+        target.closest('.item-toggle') ||
+        target.closest('.drag-handle')
+      ) {
+        return;
+      }
       isCardHandleDragging = true;
       if (state.settings?.alignment === 'free') {
         dragStartX = e.clientX;
