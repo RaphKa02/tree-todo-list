@@ -1,0 +1,331 @@
+@import "tailwindcss";
+
+:root {
+  --grid-color: rgba(255, 255, 255, 0.05);
+  --card-bg: #1e1e1e;
+  --card-shadow: rgba(0, 0, 0, 0.3);
+  --btn-bg: #333;
+  --btn-hover-bg: #444;
+  --item-hover-bg: rgba(255, 255, 255, 0.05);
+  --input-focus-bg: rgba(255, 255, 255, 0.1);
+  --input-focus-shadow: #555;
+  --progress-bg: #333;
+  --port-bg: white;
+  --add-btn-border: #444;
+  --add-btn-text: #888;
+  --add-btn-hover-border: #666;
+  --add-btn-hover-text: #ccc;
+  --connection-color: rgba(255, 255, 255, 0.4);
+}
+
+.vscode-light {
+  --grid-color: rgba(0, 0, 0, 0.05);
+  --card-bg: #ffffff;
+  --card-shadow: rgba(0, 0, 0, 0.1);
+  --btn-bg: #eeeeee;
+  --btn-hover-bg: #e0e0e0;
+  --item-hover-bg: rgba(0, 0, 0, 0.03);
+  --input-focus-bg: rgba(0, 0, 0, 0.05);
+  --input-focus-shadow: #ccc;
+  --progress-bg: #eeeeee;
+  --port-bg: #333;
+  --add-btn-border: #ccc;
+  --add-btn-text: #666;
+  --add-btn-hover-border: #999;
+  --add-btn-hover-text: #333;
+  --connection-color: rgba(0, 0, 0, 0.2);
+}
+
+body {
+  background-color: var(--vscode-editor-background);
+  color: var(--vscode-editor-foreground);
+  font-family: var(--vscode-font-family);
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+#app {
+  background-image: radial-gradient(circle, var(--grid-color) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+button {
+  cursor: pointer;
+}
+
+#connections {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+/* #container {
+  display: flex;
+  padding: 40px;
+  gap: 100px;
+  align-items: flex-start;
+  min-width: 100%;
+  min-height: 100%;
+  overflow: visible;
+  pointer-events: none;
+} */
+
+/* #container > * {
+  pointer-events: auto;
+} */
+
+/* #toolbar {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 100;
+  background: var(--vscode-editor-background);
+  padding: 4px;
+  border-radius: 4px;
+  border: 1px solid var(--vscode-panel-border);
+  box-shadow: 0 4px 12px var(--card-shadow);
+} */
+
+/* .tool-btn {
+  background: var(--vscode-button-secondaryBackground);
+  color: var(--vscode-button-secondaryForeground);
+  border: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 3px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.tool-btn:hover {
+  background: var(--vscode-button-secondaryHoverBackground);
+} */
+
+/* .column {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  min-width: 300px;
+} */
+
+/* .card {
+  --card-theme: #555;
+  background-color: var(--card-bg);
+  border: 2px solid var(--card-theme);
+  border-radius: 12px;
+  padding: 20px;
+  width: 250px;
+  box-shadow: 0 4px 6px var(--card-shadow);
+  position: relative;
+  transition: border-color 0.3s;
+} */
+
+/* .card.completed {
+  --card-theme: #4caf50;
+} */
+
+/* .drag-handle {
+  cursor: grab;
+  opacity: 0.3;
+  padding: 0 4px;
+  user-select: none;
+  transition: opacity 0.2s;
+  font-size: 0.8em;
+} */
+
+/* .drag-handle:hover {
+  opacity: 0.8;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+} */
+
+/* .delete-task-btn {
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+  font-size: 0.8em;
+}
+
+.delete-task-btn:hover {
+  opacity: 1;
+  color: #f44336;
+} */
+
+/* .card-items {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+} */
+
+/* .item-row {
+  display: flex;
+  align-items: center;
+  position: relative;
+  gap: 4px;
+} */
+
+/* .item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 0;
+  flex: 1;
+} */
+
+/* .item-actions {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.2s;
+} */
+
+/* .item-row:hover .item-actions {
+  opacity: 1;
+} */
+
+/* .action-btn {
+  cursor: pointer;
+  font-size: 0.9em;
+  padding: 2px;
+  border-radius: 4px;
+  background: var(--btn-bg);
+  line-height: 1;
+} */
+
+/* .action-btn:hover {
+  background: var(--btn-hover-bg);
+} */
+
+/* .add-item-btn {
+  margin-top: 15px;
+  padding: 6px;
+  text-align: center;
+  border: 1px dashed var(--add-btn-border);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85em;
+  width: 70%;
+  color: var(--add-btn-text);
+  transition: all 0.2s;
+} */
+
+/* .add-item-btn:hover {
+  border-color: var(--add-btn-hover-border);
+  color: var(--add-btn-hover-text);
+  background: var(--item-hover-bg);
+} */
+
+/* .item-toggle {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--card-theme);
+  border-radius: 50%;
+  cursor: pointer;
+  position: relative;
+} */
+
+/* .item-toggle.completed {
+  background-color: #4caf50;
+  border-color: #4caf50;
+} */
+
+/* .item-toggle.disabled {
+  cursor: default;
+  opacity: 0.6;
+} */
+
+/* .item-toggle.completed::after {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 2px;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+} */
+
+/* .item-toggle.completed + .item-title {
+  text-decoration: line-through;
+  opacity: 0.6;
+} */
+
+/* .progress-container {
+  position: absolute;
+  bottom: 22px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8em;
+  color: var(--add-btn-text);
+} */
+
+/* .circular-progress {
+  width: 24px;
+  height: 24px;
+} */
+
+/* .circular-progress svg {
+  transform: rotate(-90deg);
+} */
+
+/* .circular-progress circle {
+  fill: none;
+  stroke-width: 3;
+} */
+
+/* .circular-progress .bg {
+  stroke: var(--progress-bg);
+} */
+
+/* .circular-progress .fg {
+  stroke: var(--card-theme);
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  transition: stroke-dashoffset 0.3s;
+} */
+
+/* .item-port {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background-color: var(--port-bg);
+  border-radius: 50%;
+  right: -24px;
+} */
+
+/* .in-port {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background-color: var(--port-bg);
+  border-radius: 50%;
+  left: -4px;
+  top: 50%;
+  transform: translateY(-50%);
+} */
+
+/* .dragging,
+.dragging-card {
+  opacity: 0.4;
+}
+
+.dragging-card {
+  border-style: dashed;
+}
+
+.card:not(.dragging-card):hover {
+  box-shadow: 0 6px 12px var(--card-shadow);
+} */
