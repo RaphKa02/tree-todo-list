@@ -1,5 +1,11 @@
 <script lang="ts">
-  import type { Alignment } from '$lib/util';
+  import type { Alignment } from '$lib/types';
+  import SquarePlus from '@lucide/svelte/icons/square-plus';
+  import Fullscreen from '@lucide/svelte/icons/fullscreen';
+  import AlignStartHorizontal from '@lucide/svelte/icons/align-start-horizontal';
+  import AlignCenterHorizontal from '@lucide/svelte/icons/align-center-horizontal';
+  import Move from '@lucide/svelte/icons/move';
+  import FileDown from '@lucide/svelte/icons/file-down';
 
   interface Props {
     currentAlign: Alignment;
@@ -25,39 +31,41 @@
 
 <div
   id="toolbar"
-  class="fixed top-4 left-4 flex flex-col gap-2 z-50 bg-(--vscode-editor-background) p-1 border border-(--vscode-panel-border) shadow"
+  class="fixed top-4 left-4 flex flex-col gap-2 z-50 bg-background p-1 border shadow"
 >
   <button
-    class="bg-(--vscode-button-secondaryBackground) text-(--vscode-button-secondaryForeground) border-none size-7 rounded-sm cursor-pointer flex justify-center items-center shrink-0 hover:bg-(--vscode-button-secondaryHoverBackground)"
+    class="bg-btn text-btn-foreground border-none size-7 rounded-sm cursor-pointer flex justify-center items-center shrink-0 hover:bg-btn-hover"
     title="New Root Task"
     onclick={addRootTask}
   >
-    {@html icons.add}
+    <SquarePlus />
   </button>
   <button
-    class="bg-(--vscode-button-secondaryBackground) text-(--vscode-button-secondaryForeground) border-none size-7 rounded-sm cursor-pointer flex justify-center items-center shrink-0 hover:bg-(--vscode-button-secondaryHoverBackground)"
+    class="bg-btn text-btn-foreground border-none size-7 rounded-sm cursor-pointer flex justify-center items-center shrink-0 hover:bg-btn-hover"
     title="Fit to Screen"
     onclick={fitToScreen}
   >
-    {@html icons.fit}
+    <Fullscreen />
   </button>
   <button
-    class="bg-(--vscode-button-secondaryBackground) text-(--vscode-button-secondaryForeground) border-none size-7 rounded-sm cursor-pointer flex justify-center items-center shrink-0 hover:bg-(--vscode-button-secondaryHoverBackground)"
+    class="bg-btn text-btn-foreground border-none size-7 rounded-sm cursor-pointer flex justify-center items-center shrink-0 hover:bg-btn-hover"
     title="Toggle Alignment"
     onclick={toggleAlignment}
   >
-    {@html currentAlign === 'top'
-      ? icons.alignTop
-      : currentAlign === 'center'
-        ? icons.alignCenter
-        : icons.alignFree}
+    {#if currentAlign === 'top'}
+      <AlignStartHorizontal />
+    {:else if currentAlign === 'center'}
+      <AlignCenterHorizontal />
+    {:else}
+      <Move />
+    {/if}
   </button>
   <button
-    class="bg-(--vscode-button-secondaryBackground) text-(--vscode-button-secondaryForeground) border-none size-7 rounded-sm cursor-pointer flex justify-center items-center shrink-0 hover:bg-(--vscode-button-secondaryHoverBackground)"
+    class="bg-btn text-btn-foreground border-none size-7 rounded-sm cursor-pointer flex justify-center items-center shrink-0 hover:bg-btn-hover"
     title="Import JSON"
     onclick={() => fileInput?.click()}
   >
-    {@html icons.import}
+    <FileDown />
   </button>
 
   <input

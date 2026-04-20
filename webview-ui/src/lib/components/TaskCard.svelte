@@ -1,7 +1,10 @@
 <script lang="ts">
-  import { appState } from '../appState.svelte';
-  import type { Task, TaskItem } from '../types';
-  import { calculateCompletion, generateId, preventDefault } from '../util';
+  import { appState } from '$lib/appState.svelte';
+  import type { Task, TaskItem } from '$lib/types';
+  import { calculateCompletion, generateId, preventDefault } from '$lib/util';
+  import GripVertical from '@lucide/svelte/icons/grip-vertical';
+  import Link from '@lucide/svelte/icons/link';
+  import Trash from '@lucide/svelte/icons/trash-2';
 
   interface Props {
     task: Task;
@@ -122,7 +125,7 @@
   class={[
     'card',
     completion === 100 ? '[--card-theme:#4caf50]' : '[--card-theme:#555]',
-    'border-2 border-(--card-theme) rounded-xl p-5 w-xs shadow-md relative transition-colors bg-(--card-bg)',
+    'border-2 border-(--card-theme) rounded-xl p-5 w-xs shadow-md relative transition-colors bg-card text-card-foreground',
   ]}
   id="card-{task.id}"
   data-task-id={task.id}
@@ -136,7 +139,7 @@
 >
   <div class="flex items-center justify-between mb-5 font-bold gap-2 text-lg">
     <div
-      class="text-base flex-1 px-1 py-0.5 rounded-sm outline-none transition-colors wrap-anywhere hover:bg-(--item-hover-bg) focus:bg-(--input-focus-bg) focus:shadow"
+      class="text-base flex-1 px-1 py-0.5 rounded-sm outline-none transition-colors wrap-anywhere hover:bg-accent focus:bg-accent focus:shadow"
       id="title-{task.id}"
       contenteditable="true"
       bind:textContent={task.title}
@@ -146,7 +149,7 @@
       tabindex="0"
     ></div>
     <button
-      class="opacity-50 transition-color text-xs hover:opacity-100 hover:text-red-500"
+      class="opacity-50 transition-color text-xs hover:opacity-100 hover:text-destructive"
       title="Delete task and all subtasks"
       onclick={() => onDeleteTask()}
     >
@@ -155,7 +158,7 @@
   </div>
 
   <div
-    class="absolute size-2 bg-(--port-bg) rounded-full -left-1 top-1/2 -translate-y-1/2 in-port"
+    class="absolute size-2 bg-foreground rounded-full -left-1 top-1/2 -translate-y-1/2 in-port"
   ></div>
 
   <div class="flex flex-col gap-3">
@@ -186,7 +189,7 @@
           role="button"
           tabindex="0"
         >
-          ⠿
+          <GripVertical class="size-4" />
         </div>
 
         <div class="flex items-center gap-2.5 py-1 flex-1">
@@ -217,7 +220,7 @@
           {#if !item.linksTo}
             <div
               class={[
-                'text-sm flex-1 px-1 py-0.5 rounded-sm outline-none transition-colors wrap-anywhere hover:bg-(--item-hover-bg) focus:bg-(--input-focus-bg) focus:shadow',
+                'text-sm flex-1 px-1 py-0.5 rounded-sm outline-none transition-colors wrap-anywhere hover:bg-accent focus:bg-accent focus:shadow',
                 item.completed && 'line-through opacity-60',
               ]}
               id="item-title-{task.id}-{item.id}"
@@ -244,7 +247,7 @@
         <div class="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
           {#if !item.linksTo}
             <button
-              class="text-sm p-0.5 rounded-sm bg-(--btn-bg) leading-none hover:bg-(--btn-hover-bg)"
+              class="text-sm p-0.5 rounded-sm bg-btn text-btn-foreground leading-none hover:bg-btn-hover"
               title="Link to new task"
               onclick={() => {
                 const newTaskId = `task-${generateId()}`;
@@ -254,24 +257,24 @@
                 updateState();
               }}
             >
-              🔗
+              <Link class="size-4" />
             </button>
           {/if}
           <button
-            class="text-sm p-0.5 rounded-sm bg-(--btn-bg) leading-none hover:bg-(--btn-hover-bg)"
+            class="text-sm p-0.5 rounded-sm bg-btn text-btn-foreground leading-none hover:bg-btn-hover hover:text-destructive"
             title="Delete item"
             onclick={() => {
               task.items.splice(index, 1);
               updateState();
             }}
           >
-            🗑️
+            <Trash class="size-4" />
           </button>
         </div>
 
         {#if item.linksTo}
           <div
-            class="absolute size-2 bg-(--port-bg) rounded-full -right-6"
+            class="absolute size-2 bg-foreground rounded-full -right-6 z-50"
             id="port-{task.id}-{item.id}"
           ></div>
         {/if}
@@ -280,17 +283,17 @@
   </div>
 
   <button
-    class="mt-4 p-1.5 text-center border border-dashed border-(--add-btn-border) rounded-md text-sm w-2/3 text-(--add-btn-text) transition-all hover:border-(--add-btn-hover-border) hover:text-(--add-btn-hover-text) hover:bg-(--item-hover-bg)"
+    class="mt-4 p-1.5 text-center border border-dashed rounded-md text-sm w-2/3 text-muted-foreground transition-all hover:border-muted-foreground/50 hover:text-foreground hover:bg-accent"
     onclick={createItem}
   >
     + Add item
   </button>
 
-  <div class="absolute bottom-6 right-3 flex items-center gap-1.5 text-sm text-(--add-btn-text)">
+  <div class="absolute bottom-6 right-3 flex items-center gap-1.5 text-sm text-muted-foreground">
     <span>{calculateCompletion(task)}%</span>
     <div class="size-6">
       <svg viewBox="0 0 36 36" class="-rotate-90">
-        <circle class="stroke-(--progress-bg) fill-none stroke-3" cx="18" cy="18" r="16"></circle>
+        <circle class="stroke-muted fill-none stroke-3" cx="18" cy="18" r="16"></circle>
         <circle
           class="stroke-(--card-theme) [stroke-dasharray:100] transition-[stroke-dashoffset] fill-none stroke-3"
           cx="18"
