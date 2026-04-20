@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
-import { getNonce, convertJSON } from './util.js';
-import { AppState } from './types.js';
+import { convertJSON } from './shared/util.js';
+import { AppState } from './shared/types.js';
 
 export class TreeTodoEditorProvider implements vscode.CustomTextEditorProvider {
   public static register(context: vscode.ExtensionContext): vscode.Disposable {
@@ -91,7 +91,7 @@ export class TreeTodoEditorProvider implements vscode.CustomTextEditorProvider {
             const imported = JSON.parse(content.toString());
             const convertedState = convertJSON(imported);
             const filename = imported.workflow?.title || 'imported-todo';
-            await provider.createNewTreeTodo(convertedState, filename);
+            await provider.importTreeTodo(convertedState, filename);
           } catch (err) {
             vscode.window.showErrorMessage('Failed to parse or import JSON file.');
           }
@@ -150,6 +150,11 @@ export class TreeTodoEditorProvider implements vscode.CustomTextEditorProvider {
     webviewPanel: vscode.WebviewPanel,
     _token: vscode.CancellationToken
   ): Promise<void> {
+    if (document.uri.scheme === 'git' || document.uri.scheme === 'gitlens') {
+      vscode.commands.executeCommand('workbench.action.reopenWithEditor', document.uri, 'default', webviewPanel.viewColumn);
+      // return;
+    }
+
     webviewPanel.webview.options = {
       enableScripts: true,
     };
@@ -214,7 +219,7 @@ export class TreeTodoEditorProvider implements vscode.CustomTextEditorProvider {
     updateWebview();
   }
 
-  private async createNewTreeTodo(state: AppState, filename: string) {
+  private async importTreeTodo(state: AppState, filename: string) {
     const workspaceFolders = vscode.workspace.workspaceFolders;
     if (!workspaceFolders) {
       vscode.window.showErrorMessage('Importing a Tree Todo file requires a workspace to be open.');

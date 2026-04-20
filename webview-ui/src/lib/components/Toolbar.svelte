@@ -1,6 +1,8 @@
 <script lang="ts">
+  import type { Alignment } from '$lib/util';
+
   interface Props {
-    currentAlign: 'top' | 'center' | 'free';
+    currentAlign: Alignment;
     handleImport: (e: Event) => void;
     addRootTask: () => void;
     toggleAlignment: () => void;

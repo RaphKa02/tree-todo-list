@@ -1,5 +1,5 @@
-import { AppState, Task } from '../types.js';
-import { convertJSON } from '../util.js';
+import { AppState, Task } from '../shared/types.js';
+import { convertJSON } from '../shared/util.js';
 
 interface VsCodeApi {
   postMessage(message: any): void;

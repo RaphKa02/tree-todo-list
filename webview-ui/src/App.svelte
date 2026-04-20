@@ -1,10 +1,10 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
-  import type { Task } from './lib/types';
-  import { calculateCompletion, convertJSON, generateId } from './lib/util';
-  import Toolbar from './lib/components/Toolbar.svelte';
-  import { appState } from './lib/appState.svelte';
-  import TaskCard from './lib/components/TaskCard.svelte';
+  import type { Alignment, Task } from '$lib/types';
+  import { calculateCompletion, convertJSON, generateId } from '$lib/util';
+  import Toolbar from '$lib/components/Toolbar.svelte';
+  import { appState } from '$lib/appState.svelte';
+  import TaskCard from '$lib/components/TaskCard.svelte';
 
   // VS Code API
   interface VsCodeApi {
@@ -32,12 +32,16 @@
   let isPanning = false;
   let startPan = { x: 0, y: 0 };
   let pendingFocusId: string | null = $state(null);
+  let preservedSelection: { id: string; offset: number } | null = null;
   let globalMaxPasses = 10;
   let globalAutoReorderTasks = true;
   let hasInitiallyFitted = false;
 
   const previousState = vscode.getState();
-  Object.assign(appState, previousState?.state || { tasks: [] });
+  if (previousState?.state) {
+    appState.tasks = previousState.state.tasks || [];
+    appState.settings = previousState.state.settings;
+  }
 
   if (previousState?.viewState) {
     scale = previousState.viewState.scale;
@@ -45,19 +49,11 @@
     hasInitiallyFitted = true;
   }
 
-  const currentAlign = $derived(appState.settings?.alignment || 'center');
+  const currentAlign = $derived<Alignment>(appState.settings?.alignment || 'center');
 
   // Derived Data
   const depths = $derived(getTaskDepth(appState.tasks));
   const maxDepth = $derived(Math.max(0, ...Array.from(depths.values())));
-
-  // Drag Logic State
-  let isCardHandleDragging = $state(false);
-  let draggingTaskId: string | null = $state(null);
-  let dragStartX = $state(0);
-  let dragStartY = $state(0);
-  let cardStartX = $state(0);
-  let cardStartY = $state(0);
 
   onMount(() => {
     vscode.postMessage({ type: 'ready' });
@@ -70,26 +66,47 @@
   });
 
   $effect(() => {
-    if (pendingFocusId) {
-      const el = document.getElementById(pendingFocusId);
+    let focusId = pendingFocusId || preservedSelection?.id;
+    if (focusId) {
+      const el = document.getElementById(focusId);
       if (el) {
         el.focus();
         const selection = window.getSelection();
         const range = document.createRange();
+
         if (el.childNodes.length > 0) {
-          range.selectNodeContents(el);
-          range.collapse(false); // Move caret to end
+          const node = el.childNodes[0];
+          let offset = 0;
+          if (pendingFocusId) {
+            offset = node.textContent?.length || 0;
+          } else if (preservedSelection) {
+            offset = Math.min(preservedSelection.offset, node.textContent?.length || 0);
+          }
+          range.setStart(node, offset);
+          range.collapse(true);
         } else {
           range.setStart(el, 0);
           range.collapse(true);
         }
         selection?.removeAllRanges();
         selection?.addRange(range);
-        pendingFocusId = null;
       }
+      pendingFocusId = null;
+      preservedSelection = null;
     }
     requestAnimationFrame(drawConnections);
   });
+
+  function setState(state?: any) {
+    vscode.setState({
+      state: state || {
+        tasks: $state.snapshot(appState.tasks),
+        settings: $state.snapshot(appState.settings),
+      },
+      viewState: { scale, offset },
+    });
+    requestAnimationFrame(drawConnections);
+  }
 
   function updateState() {
     const maxPasses = Math.max(1, globalMaxPasses);
@@ -117,7 +134,14 @@
     }
 
     if (globalAutoReorderTasks) reorderTasks();
-    vscode.postMessage({ type: 'update', state: appState });
+
+    const saveState = {
+      tasks: $state.snapshot(appState.tasks),
+      settings: $state.snapshot(appState.settings),
+    };
+
+    vscode.postMessage({ type: 'update', state: saveState });
+    setState(saveState);
   }
 
   function reorderTasks() {
@@ -219,10 +243,7 @@
     scale = Math.max(0.2, newScale);
     offset.x = (window.innerWidth - (maxX - minX) * scale) / 2 - minX * scale;
     offset.y = (window.innerHeight - (maxY - minY) * scale) / 2 - minY * scale;
-    vscode.setState({ state: appState, viewState: { scale, offset } });
-
-    await tick();
-    drawConnections();
+    setState();
   }
 
   function drawConnections() {
@@ -306,11 +327,22 @@
   function handleMessage(event: MessageEvent) {
     const { type, text, config } = event.data;
     if (type === 'update') {
+      const activeEl = document.activeElement as HTMLElement;
+      if (activeEl && (activeEl.isContentEditable || activeEl.tagName === 'INPUT')) {
+        const selection = window.getSelection();
+        preservedSelection = {
+          id: activeEl.id,
+          offset: selection?.anchorOffset || 0,
+        };
+      }
+
       if (config.maxPasses !== undefined) globalMaxPasses = config.maxPasses;
       if (config.autoReorderTasks !== undefined) globalAutoReorderTasks = config.autoReorderTasks;
       if (text) {
         try {
-          Object.assign(appState, JSON.parse(text));
+          const newState = JSON.parse(text);
+          appState.tasks = newState.tasks || [];
+          appState.settings = newState.settings;
         } catch (e) {
           vscode.postMessage({
             type: 'error',
@@ -320,19 +352,19 @@
           return;
         }
       } else {
-        Object.assign(appState, { tasks: [] });
+        appState.tasks = [];
       }
-      vscode.setState({ state: appState, viewState: { scale, offset } });
       if (!hasInitiallyFitted && appState.tasks.length > 0) {
         fitToScreen();
         hasInitiallyFitted = true;
+        return;
       }
+      setState();
     }
   }
 
   function handleWheel(e: WheelEvent) {
     if (e.ctrlKey || e.metaKey) {
-      e.preventDefault();
       const delta = -e.deltaY;
       const factor = 1.1;
       const newScale = delta > 0 ? scale * factor : scale / factor;
@@ -343,15 +375,15 @@
         offset.x = mouseX - (mouseX - offset.x) * (newScale / scale);
         offset.y = mouseY - (mouseY - offset.y) * (newScale / scale);
         scale = newScale;
-        vscode.setState({ state: appState, viewState: { scale, offset } });
-        requestAnimationFrame(drawConnections);
       }
-    } else if (!e.shiftKey) {
+    } else if (e.shiftKey) {
+      offset.x -= e.deltaY;
+      offset.y -= e.deltaX;
+    } else {
       offset.x -= e.deltaX;
       offset.y -= e.deltaY;
-      vscode.setState({ state: appState, viewState: { scale, offset } });
-      requestAnimationFrame(drawConnections);
     }
+    setState();
   }
 
   function handleWindowMouseDown(e: MouseEvent) {
@@ -376,13 +408,13 @@
       offset.x = e.clientX - startPan.x;
       offset.y = e.clientY - startPan.y;
       requestAnimationFrame(drawConnections);
-    } else if (isCardHandleDragging && draggingTaskId) {
-      const task = appState.tasks.find((t) => t.id === draggingTaskId);
+    } else if (appState.dragState.isDragging && appState.dragState.taskId) {
+      const task = appState.tasks.find((t) => t.id === appState.dragState.taskId);
       if (task) {
-        const dx = (e.clientX - dragStartX) / scale;
-        const dy = (e.clientY - dragStartY) / scale;
-        task.x = cardStartX + dx;
-        task.y = cardStartY + dy;
+        const dx = (e.clientX - appState.dragState.startX) / scale;
+        const dy = (e.clientY - appState.dragState.startY) / scale;
+        task.x = appState.dragState.cardStartX + dx;
+        task.y = appState.dragState.cardStartY + dy;
         requestAnimationFrame(drawConnections);
       }
     }
@@ -392,16 +424,14 @@
     if (isPanning) {
       isPanning = false;
       document.body.style.cursor = 'default';
+      setState();
     }
-    if (isCardHandleDragging) {
-      isCardHandleDragging = false;
-      draggingTaskId = null;
-      vscode.setState({ state: appState, viewState: { scale, offset } });
+    if (appState.dragState.isDragging) {
+      appState.dragState.isDragging = false;
+      appState.dragState.taskId = null;
       updateState();
     }
   }
-
-  // --- Card Events ---
 
   function addRootTask() {
     const newId = `task-${generateId()}`;
@@ -417,7 +447,7 @@
 
   function toggleAlignment() {
     if (!appState.settings) appState.settings = { alignment: 'center' };
-    const modes: ('top' | 'center' | 'free')[] = ['top', 'center', 'free'];
+    const modes: Alignment[] = ['top', 'center', 'free'];
     const nextMode = modes[(modes.indexOf(appState.settings.alignment) + 1) % modes.length];
 
     if (nextMode === 'free') {

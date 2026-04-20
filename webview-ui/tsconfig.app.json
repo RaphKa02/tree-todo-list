@@ -14,7 +14,11 @@
      */
     "allowJs": true,
     "checkJs": true,
-    "moduleDetection": "force"
+    "moduleDetection": "force",
+    "paths": {
+      "$lib/*": ["./src/lib/*"],
+      "$shared/*": ["../src/shared/*"]
+    }
   },
-  "include": ["src/**/*.ts", "src/**/*.js", "src/**/*.svelte"]
+  "include": ["src/**/*.ts", "src/**/*.js", "src/**/*.svelte", "../src/shared/**/*.ts"]
 }

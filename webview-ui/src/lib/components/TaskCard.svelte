@@ -12,13 +12,6 @@
 
   let { task, onDeleteTask, updateState, pendingFocusId = $bindable(null) }: Props = $props();
 
-  let isCardHandleDragging = $state(false);
-  let draggingTaskId: string | null = $state(null);
-  let dragStartX = $state(0);
-  let dragStartY = $state(0);
-  let cardStartX = $state(0);
-  let cardStartY = $state(0);
-
   let isItemHandleDragging = $state(false);
   let draggingItemHandleId: string | null = $state(null);
   let draggingItemId: string | null = $state(null);
@@ -39,12 +32,12 @@
     }
 
     if (appState.settings?.alignment === 'free') {
-      isCardHandleDragging = true;
-      draggingTaskId = task.id;
-      dragStartX = e.clientX;
-      dragStartY = e.clientY;
-      cardStartX = task.x || 0;
-      cardStartY = task.y || 0;
+      appState.dragState.isDragging = true;
+      appState.dragState.taskId = task.id;
+      appState.dragState.startX = e.clientX;
+      appState.dragState.startY = e.clientY;
+      appState.dragState.cardStartX = task.x || 0;
+      appState.dragState.cardStartY = task.y || 0;
       e.stopPropagation();
     }
   }
@@ -56,42 +49,31 @@
     }
   }
 
-  function handleTitleBlur(e: FocusEvent) {
-    const newTitle = (e.target as HTMLElement).textContent || '';
-    if (task.title !== newTitle) {
-      task.title = newTitle;
-      updateState();
-    }
+  function handleTitleBlur() {
+    updateState();
   }
 
   function handleItemTitleKeydown(e: KeyboardEvent, item: TaskItem, index: number) {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      if (index === task.items.length - 1) {
-        item.title = (e.target as HTMLElement).textContent || '';
-        createItem();
-      } else {
-        (e.target as HTMLElement).blur();
-      }
-    } else if (e.key === 'Escape') {
+    const isEnter = e.key === 'Enter';
+    if (isEnter || e.key === 'Escape') {
       e.preventDefault();
       (e.target as HTMLElement).blur();
+
+      const isLast = index === task.items.length - 1;
+      if (isEnter && isLast && item.title.trim() !== '') {
+        createItem();
+      }
     }
   }
 
-  function handleItemTitleBlur(e: FocusEvent, item: TaskItem, index: number) {
+  function handleItemTitleBlur(item: TaskItem, index: number) {
     if (item.linksTo) return;
-    const newTitle = (e.target as HTMLElement).textContent?.trim() || '';
 
-    if (newTitle === '' && index === task.items.length - 1) {
+    if (item.title.trim() === '' && index === task.items.length - 1 && task.items.length !== 1) {
       task.items.splice(index, 1);
-      updateState();
-      return;
     }
-    if (item.title !== newTitle) {
-      item.title = newTitle;
-      updateState();
-    }
+
+    updateState();
   }
 
   function handleItemDragStart(e: DragEvent, taskId: string, index: number) {
@@ -149,7 +131,7 @@
   aria-roledescription="draggable card"
   aria-label="Task card: {task.title}"
   style={appState.settings?.alignment === 'free'
-    ? 'position absolute; left: {task.x || 0}px; top: {task.y || 0}px;'
+    ? `position: absolute; left: ${task.x || 0}px; top: ${task.y || 0}px;`
     : ''}
 >
   <div class="flex items-center justify-between mb-5 font-bold gap-2 text-lg">
@@ -157,13 +139,12 @@
       class="text-base flex-1 px-1 py-0.5 rounded-sm outline-none transition-colors wrap-anywhere hover:bg-(--item-hover-bg) focus:bg-(--input-focus-bg) focus:shadow"
       id="title-{task.id}"
       contenteditable="true"
-      onblur={(e) => handleTitleBlur(e)}
+      bind:textContent={task.title}
+      onblur={handleTitleBlur}
       onkeydown={handleTitleKeydown}
       role="textbox"
       tabindex="0"
-    >
-      {task.title}
-    </div>
+    ></div>
     <button
       class="opacity-50 transition-color text-xs hover:opacity-100 hover:text-red-500"
       title="Delete task and all subtasks"
@@ -193,7 +174,7 @@
         role="listitem"
       >
         <div
-          class="cursor-grab opacity-30 px-1 select-none transition-opacity text-sm hover:opacity-80 active:cursor-grabbing"
+          class="drag-handle cursor-grab opacity-30 px-1 select-none transition-opacity text-sm hover:opacity-80 active:cursor-grabbing"
           onmousedown={() => {
             isItemHandleDragging = true;
             draggingItemHandleId = `${task.id}-${index}`;
@@ -213,7 +194,7 @@
             class={[
               'size-5 border-2 border-(--card-theme) rounded-full cursor-pointer relative',
               item.completed && 'bg-[#4caf50] border-[#4caf50] completed',
-              item.linksTo && 'cursor-default opacity-60',
+              item.linksTo && 'cursor-default! opacity-60',
             ]}
             onclick={() => {
               if (!item.linksTo) {
@@ -233,20 +214,31 @@
             aria-checked={item.completed}
             tabindex="0"
           ></div>
-          <div
-            class={[
-              'text-sm flex-1 px-1 py-0.5 rounded-sm outline-none transition-colors wrap-anywhere hover:bg-(--item-hover-bg) focus:bg-(--input-focus-bg) focus:shadow',
-              item.completed ?? 'line-through opacity-60',
-            ]}
-            id="item-title-{task.id}-{item.id}"
-            contenteditable={!item.linksTo}
-            onblur={(e) => handleItemTitleBlur(e, item, index)}
-            onkeydown={(e) => handleItemTitleKeydown(e, item, index)}
-            role="textbox"
-            tabindex="0"
-          >
-            {item.title}
-          </div>
+          {#if !item.linksTo}
+            <div
+              class={[
+                'text-sm flex-1 px-1 py-0.5 rounded-sm outline-none transition-colors wrap-anywhere hover:bg-(--item-hover-bg) focus:bg-(--input-focus-bg) focus:shadow',
+                item.completed && 'line-through opacity-60',
+              ]}
+              id="item-title-{task.id}-{item.id}"
+              contenteditable
+              bind:textContent={item.title}
+              onblur={() => handleItemTitleBlur(item, index)}
+              onkeydown={(e) => handleItemTitleKeydown(e, item, index)}
+              role="textbox"
+              tabindex="0"
+            ></div>
+          {:else}
+            <div
+              class={[
+                'text-sm flex-1 px-1 py-0.5 rounded-sm outline-none transition-colors opacity-80 wrap-anywhere cursor-default',
+                item.completed && 'line-through opacity-60',
+              ]}
+              id="item-title-{task.id}-{item.id}"
+            >
+              {item.title}
+            </div>
+          {/if}
         </div>
 
         <div class="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
