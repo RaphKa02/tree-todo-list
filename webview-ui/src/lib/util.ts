@@ -1,4 +1,4 @@
-import type { Task } from './types';
+import type { Task } from '$lib/types';
 export { convertJSON } from '$shared/util';
 
 export function preventDefault<T extends Event>(fn?: (event: T) => void) {

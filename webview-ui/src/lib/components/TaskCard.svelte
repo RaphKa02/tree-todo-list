@@ -125,7 +125,7 @@
   class={[
     'card',
     completion === 100 ? '[--card-theme:#4caf50]' : '[--card-theme:#555]',
-    'border-2 border-(--card-theme) rounded-xl p-5 w-xs shadow-md relative transition-colors bg-card text-card-foreground',
+    'bg-card text-card-foreground relative w-xs rounded-xl border-2 border-(--card-theme) p-5 shadow-md transition-colors',
   ]}
   id="card-{task.id}"
   data-task-id={task.id}
@@ -137,9 +137,9 @@
     ? `position: absolute; left: ${task.x || 0}px; top: ${task.y || 0}px;`
     : ''}
 >
-  <div class="flex items-center justify-between mb-5 font-bold gap-2 text-lg">
+  <div class="mb-5 flex items-center justify-between gap-2 text-lg font-bold">
     <div
-      class="text-base flex-1 px-1 py-0.5 rounded-sm outline-none transition-colors wrap-anywhere hover:bg-accent focus:bg-accent focus:shadow"
+      class="hover:bg-accent focus:bg-accent flex-1 rounded-sm px-1 py-0.5 text-base wrap-anywhere transition-colors outline-none focus:shadow"
       id="title-{task.id}"
       contenteditable="true"
       bind:textContent={task.title}
@@ -149,7 +149,7 @@
       tabindex="0"
     ></div>
     <button
-      class="opacity-50 transition-color text-xs hover:opacity-100 hover:text-destructive"
+      class="transition-color hover:text-destructive text-xs opacity-50 hover:opacity-100"
       title="Delete task and all subtasks"
       onclick={() => onDeleteTask()}
     >
@@ -158,14 +158,14 @@
   </div>
 
   <div
-    class="absolute size-2 bg-foreground rounded-full -left-1 top-1/2 -translate-y-1/2 in-port"
+    class="bg-foreground in-port absolute top-1/2 -left-1 size-2 -translate-y-1/2 rounded-full"
   ></div>
 
   <div class="flex flex-col gap-3">
     {#each task.items as item, index (item.id)}
       <div
         class={[
-          'group flex items-center gap-1 relative',
+          'group relative flex items-center gap-1',
           draggingItemId === `${task.id}-${index}` && 'opacity-40',
         ]}
         data-index={index}
@@ -177,7 +177,7 @@
         role="listitem"
       >
         <div
-          class="drag-handle cursor-grab opacity-30 px-1 select-none transition-opacity text-sm hover:opacity-80 active:cursor-grabbing"
+          class="drag-handle cursor-grab px-1 text-sm opacity-30 transition-opacity select-none hover:opacity-80 active:cursor-grabbing"
           onmousedown={() => {
             isItemHandleDragging = true;
             draggingItemHandleId = `${task.id}-${index}`;
@@ -192,11 +192,11 @@
           <GripVertical class="size-4" />
         </div>
 
-        <div class="flex items-center gap-2.5 py-1 flex-1">
+        <div class="flex flex-1 items-center gap-2.5 py-1">
           <div
             class={[
-              'size-5 border-2 border-(--card-theme) rounded-full cursor-pointer relative',
-              item.completed && 'bg-[#4caf50] border-[#4caf50] completed',
+              'relative size-5 cursor-pointer rounded-full border-2 border-(--card-theme)',
+              item.completed && 'completed border-[#4caf50] bg-[#4caf50]',
               item.linksTo && 'cursor-default! opacity-60',
             ]}
             onclick={() => {
@@ -220,7 +220,7 @@
           {#if !item.linksTo}
             <div
               class={[
-                'text-sm flex-1 px-1 py-0.5 rounded-sm outline-none transition-colors wrap-anywhere hover:bg-accent focus:bg-accent focus:shadow',
+                'hover:bg-accent focus:bg-accent flex-1 rounded-sm px-1 py-0.5 text-sm wrap-anywhere transition-colors outline-none focus:shadow',
                 item.completed && 'line-through opacity-60',
               ]}
               id="item-title-{task.id}-{item.id}"
@@ -234,7 +234,7 @@
           {:else}
             <div
               class={[
-                'text-sm flex-1 px-1 py-0.5 rounded-sm outline-none transition-colors opacity-80 wrap-anywhere cursor-default',
+                'flex-1 cursor-default rounded-sm px-1 py-0.5 text-sm wrap-anywhere opacity-80 transition-colors outline-none',
                 item.completed && 'line-through opacity-60',
               ]}
               id="item-title-{task.id}-{item.id}"
@@ -247,7 +247,7 @@
         <div class="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
           {#if !item.linksTo}
             <button
-              class="text-sm p-0.5 rounded-sm bg-btn text-btn-foreground leading-none hover:bg-btn-hover"
+              class="bg-btn text-btn-foreground hover:bg-btn-hover rounded-sm p-0.5 text-sm leading-none"
               title="Link to new task"
               onclick={() => {
                 const newTaskId = `task-${generateId()}`;
@@ -261,7 +261,7 @@
             </button>
           {/if}
           <button
-            class="text-sm p-0.5 rounded-sm bg-btn text-btn-foreground leading-none hover:bg-btn-hover hover:text-destructive"
+            class="bg-btn text-btn-foreground hover:bg-btn-hover hover:text-destructive rounded-sm p-0.5 text-sm leading-none"
             title="Delete item"
             onclick={() => {
               task.items.splice(index, 1);
@@ -274,7 +274,7 @@
 
         {#if item.linksTo}
           <div
-            class="absolute size-2 bg-foreground rounded-full -right-6 z-50"
+            class="bg-foreground absolute -right-6 z-50 size-2 rounded-full"
             id="port-{task.id}-{item.id}"
           ></div>
         {/if}
@@ -283,19 +283,19 @@
   </div>
 
   <button
-    class="mt-4 p-1.5 text-center border border-dashed rounded-md text-sm w-2/3 text-muted-foreground transition-all hover:border-muted-foreground/50 hover:text-foreground hover:bg-accent"
+    class="text-muted-foreground hover:border-muted-foreground/50 hover:text-foreground hover:bg-accent mt-4 w-2/3 rounded-md border border-dashed p-1.5 text-center text-sm transition-all"
     onclick={createItem}
   >
     + Add item
   </button>
 
-  <div class="absolute bottom-6 right-3 flex items-center gap-1.5 text-sm text-muted-foreground">
+  <div class="text-muted-foreground absolute right-3 bottom-6 flex items-center gap-1.5 text-sm">
     <span>{calculateCompletion(task)}%</span>
     <div class="size-6">
       <svg viewBox="0 0 36 36" class="-rotate-90">
         <circle class="stroke-muted fill-none stroke-3" cx="18" cy="18" r="16"></circle>
         <circle
-          class="stroke-(--card-theme) [stroke-dasharray:100] transition-[stroke-dashoffset] fill-none stroke-3"
+          class="fill-none stroke-(--card-theme) stroke-3 transition-[stroke-dashoffset] [stroke-dasharray:100]"
           cx="18"
           cy="18"
           r="16"

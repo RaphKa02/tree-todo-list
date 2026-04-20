@@ -31,24 +31,24 @@
 
 <div
   id="toolbar"
-  class="fixed top-4 left-4 flex flex-col gap-2 z-50 bg-background p-1 border shadow"
+  class="bg-background fixed top-4 left-4 z-50 flex flex-col gap-2 border p-1 shadow"
 >
   <button
-    class="bg-btn text-btn-foreground border-none size-7 rounded-sm cursor-pointer flex justify-center items-center shrink-0 hover:bg-btn-hover"
+    class="bg-btn text-btn-foreground hover:bg-btn-hover flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-sm border-none"
     title="New Root Task"
     onclick={addRootTask}
   >
     <SquarePlus />
   </button>
   <button
-    class="bg-btn text-btn-foreground border-none size-7 rounded-sm cursor-pointer flex justify-center items-center shrink-0 hover:bg-btn-hover"
+    class="bg-btn text-btn-foreground hover:bg-btn-hover flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-sm border-none"
     title="Fit to Screen"
     onclick={fitToScreen}
   >
     <Fullscreen />
   </button>
   <button
-    class="bg-btn text-btn-foreground border-none size-7 rounded-sm cursor-pointer flex justify-center items-center shrink-0 hover:bg-btn-hover"
+    class="bg-btn text-btn-foreground hover:bg-btn-hover flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-sm border-none"
     title="Toggle Alignment"
     onclick={toggleAlignment}
   >
@@ -61,7 +61,7 @@
     {/if}
   </button>
   <button
-    class="bg-btn text-btn-foreground border-none size-7 rounded-sm cursor-pointer flex justify-center items-center shrink-0 hover:bg-btn-hover"
+    class="bg-btn text-btn-foreground hover:bg-btn-hover flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-sm border-none"
     title="Import JSON"
     onclick={() => fileInput?.click()}
   >

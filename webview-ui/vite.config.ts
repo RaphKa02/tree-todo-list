@@ -1,18 +1,15 @@
-import { defineConfig } from 'vite'
-import { svelte } from '@sveltejs/vite-plugin-svelte'
-import tailwindcss from '@tailwindcss/vite'
-import path from 'path'
+import { defineConfig } from 'vite';
+import { svelte } from '@sveltejs/vite-plugin-svelte';
+import tailwindcss from '@tailwindcss/vite';
+import path from 'path';
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [
-    svelte(),
-    tailwindcss()
-  ],
+  plugins: [svelte(), tailwindcss()],
   resolve: {
     alias: {
-      '$lib': path.resolve(__dirname, './src/lib'),
-      '$shared': path.resolve(__dirname, '../src/shared')
-    }
-  }
-})
+      $lib: path.resolve(__dirname, './src/lib'),
+      $shared: path.resolve(__dirname, '../src/shared'),
+    },
+  },
+});

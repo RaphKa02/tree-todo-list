@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { onMount, tick } from 'svelte';
-  import type { Alignment, Task } from '$lib/types';
-  import { calculateCompletion, convertJSON, generateId } from '$lib/util';
-  import Toolbar from '$lib/components/Toolbar.svelte';
   import { appState } from '$lib/appState.svelte';
   import TaskCard from '$lib/components/TaskCard.svelte';
+  import Toolbar from '$lib/components/Toolbar.svelte';
+  import type { Alignment, Task } from '$lib/types';
+  import { calculateCompletion, convertJSON, generateId } from '$lib/util';
+  import { onMount } from 'svelte';
 
   // VS Code API
   interface VsCodeApi {
@@ -21,12 +21,10 @@
     vscode = { postMessage: () => {}, getState: () => ({}), setState: () => {} };
   }
 
-  // DOM Refs
   let app: HTMLElement;
   let container: HTMLElement;
   let canvas: HTMLCanvasElement;
 
-  // State
   let scale = $state(1);
   let offset = $state({ x: 0, y: 0 });
   let isPanning = false;
@@ -51,7 +49,6 @@
 
   const currentAlign = $derived<Alignment>(appState.settings?.alignment || 'center');
 
-  // Derived Data
   const depths = $derived(getTaskDepth(appState.tasks));
   const maxDepth = $derived(Math.max(0, ...Array.from(depths.values())));
 
@@ -491,14 +488,14 @@
   />
 {/snippet}
 
-<div id="app" class="relative w-dvw h-dvh" bind:this={app}>
+<div id="app" class="relative h-dvh w-dvw" bind:this={app}>
   <Toolbar {currentAlign} {handleImport} {addRootTask} {toggleAlignment} {fitToScreen} />
-  <canvas id="connections" class="absolute top-0 left-0 pointer-events-none" bind:this={canvas}
+  <canvas id="connections" class="pointer-events-none absolute top-0 left-0" bind:this={canvas}
   ></canvas>
 
   <div
     id="container"
-    class="flex p-10 gap-24 items-start min-w-full min-h-full"
+    class="flex min-h-full min-w-full items-start gap-24 p-10"
     bind:this={container}
     style="transform: translate({offset.x}px, {offset.y}px) scale({scale}); transform-origin: 0 0; align-items: {currentAlign ===
     'center'
@@ -508,7 +505,7 @@
   >
     {#if currentAlign !== 'free'}
       {#each Array(maxDepth + 1) as _, depth}
-        <div class="flex flex-col gap-10 min-w-2xs" data-depth={depth}>
+        <div class="flex min-w-2xs flex-col gap-10" data-depth={depth}>
           {#each appState.tasks.filter((t) => depths.get(t.id) === depth) as task (task.id)}
             {@render taskCard(task)}
           {/each}

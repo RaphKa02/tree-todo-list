@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 @custom-variant dark (&:is(.dark *, .vscode-dark *));
 
 :root {
@@ -39,7 +39,8 @@
   --port-bg: oklch(0.145 0 0);
 }
 
-.dark, .vscode-dark {
+.dark,
+.vscode-dark {
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.269 0 0);

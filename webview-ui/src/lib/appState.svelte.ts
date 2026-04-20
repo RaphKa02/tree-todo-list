@@ -1,7 +1,8 @@
-import type { Alignment, AppState as IAppState, Task } from "./types";
+import type { Alignment, AppState as IAppState, Task } from '$lib/types';
+
 class AppState implements IAppState {
   tasks = $state<Task[]>([]);
-  settings? = $state<{ alignment: Alignment; }>();
+  settings? = $state<{ alignment: Alignment }>();
 
   dragState = $state({
     isDragging: false,
