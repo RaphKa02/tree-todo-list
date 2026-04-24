@@ -16,6 +16,8 @@ export type Task = {
 export type AppState = {
   tasks: Task[];
   settings?: {
-    alignment: 'top' | 'center' | 'free';
+    alignment: Alignment;
   };
 };
+
+export type Alignment = 'top' | 'center' | 'free';

@@ -3,8 +3,13 @@
     "module": "Node16",
     "target": "ES2022",
     "outDir": "dist",
-    "lib": ["ES2022", "DOM"],
-    "types": ["node"],
+    "lib": [
+      "ES2022",
+      "DOM"
+    ],
+    "types": [
+      "node"
+    ],
     "sourceMap": true,
     "rootDir": "src",
     "strict": true,
@@ -12,5 +17,9 @@
     "noFallthroughCasesInSwitch": true,
     "noUnusedParameters": true
   },
-  "exclude": ["node_modules", ".vscode-test"]
+  "exclude": [
+    "node_modules",
+    ".vscode-test",
+    "webview-ui"
+  ]
 }

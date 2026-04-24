@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
-import { getNonce, convertJSON } from './util.js';
-import { AppState } from './types.js';
+import { convertJSON } from './shared/util.js';
+import { AppState } from './shared/types.js';
 
 export class TreeTodoEditorProvider implements vscode.CustomTextEditorProvider {
   public static register(context: vscode.ExtensionContext): vscode.Disposable {
@@ -91,7 +91,7 @@ export class TreeTodoEditorProvider implements vscode.CustomTextEditorProvider {
             const imported = JSON.parse(content.toString());
             const convertedState = convertJSON(imported);
             const filename = imported.workflow?.title || 'imported-todo';
-            await provider.createNewTreeTodo(convertedState, filename);
+            await provider.importTreeTodo(convertedState, filename);
           } catch (err) {
             vscode.window.showErrorMessage('Failed to parse or import JSON file.');
           }
@@ -143,17 +143,22 @@ export class TreeTodoEditorProvider implements vscode.CustomTextEditorProvider {
 
   private static readonly viewType = 'tree-todo-list.editor';
 
-  constructor(private readonly context: vscode.ExtensionContext) {}
+  constructor(private readonly context: vscode.ExtensionContext) { }
 
   public async resolveCustomTextEditor(
     document: vscode.TextDocument,
     webviewPanel: vscode.WebviewPanel,
     _token: vscode.CancellationToken
   ): Promise<void> {
+    if (document.uri.scheme === 'git' || document.uri.scheme === 'gitlens') {
+      vscode.commands.executeCommand('workbench.action.reopenWithEditor', document.uri, 'default', webviewPanel.viewColumn);
+      // return;
+    }
+
     webviewPanel.webview.options = {
       enableScripts: true,
     };
-    webviewPanel.webview.html = this.getHtmlForWebview(webviewPanel.webview);
+    webviewPanel.webview.html = await this.buildHtmlForWebview(webviewPanel.webview);
 
     function updateWebview() {
       const config = vscode.workspace.getConfiguration('tree-todo-list');
@@ -214,7 +219,7 @@ export class TreeTodoEditorProvider implements vscode.CustomTextEditorProvider {
     updateWebview();
   }
 
-  private async createNewTreeTodo(state: AppState, filename: string) {
+  private async importTreeTodo(state: AppState, filename: string) {
     const workspaceFolders = vscode.workspace.workspaceFolders;
     if (!workspaceFolders) {
       vscode.window.showErrorMessage('Importing a Tree Todo file requires a workspace to be open.');
@@ -230,35 +235,37 @@ export class TreeTodoEditorProvider implements vscode.CustomTextEditorProvider {
     await vscode.commands.executeCommand('vscode.open', uri);
   }
 
-  private getHtmlForWebview(webview: vscode.Webview): string {
-    const scriptUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this.context.extensionUri, 'dist', 'webview', 'treeTodo.js')
+  private async buildHtmlForWebview(webview: vscode.Webview): Promise<string> {
+    const webviewUri = vscode.Uri.joinPath(
+      this.context.extensionUri,
+      "webview-ui",
+      "dist"
     );
-
-    const styleMainUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this.context.extensionUri, 'media', 'treeTodo.css')
+    const content = await vscode.workspace.fs.readFile(
+      vscode.Uri.joinPath(webviewUri, "index.html")
     );
+    let html = new TextDecoder().decode(content);
 
-    const nonce = getNonce();
+    return this.fixLinks(html, webview, webviewUri);
+  }
 
-    return `
-			<!DOCTYPE html>
-			<html lang="en">
-			<head>
-				<meta charset="UTF-8">
-				<meta http-equiv="Content-Security-Policy" content="default-src 'none'; connect-src ${webview.cspSource}; img-src ${webview.cspSource}; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}';">
-				<meta name="viewport" content="width=device-width, initial-scale=1.0">
-				<link href="${styleMainUri}" rel="stylesheet" />
-				<title>Tree Todo List</title>
-			</head>
-			<body>
-				<div id="app">
-					<canvas id="connections"></canvas>
-					<div id="container"></div>
-				</div>
-				<script type="module" nonce="${nonce}" src="${scriptUri}"></script>
-			</body>
-</html>`;
+  private fixLinks(document: string, webview: vscode.Webview, documentUri: vscode.Uri): string {
+    return document.replace(
+      new RegExp("((?:src|href)=['\"])(.*?)(['\"])", "gmi"),
+      (subString: string, p1: string, p2: string, p3: string): string => {
+        const lower = p2.toLowerCase();
+        if (
+          p2.startsWith("#") ||
+          lower.startsWith("http://") ||
+          lower.startsWith("https://")
+        ) {
+          return subString;
+        }
+        const newUri = vscode.Uri.joinPath(documentUri, p2);
+        const newUrl = [p1, webview.asWebviewUri(newUri), p3].join("");
+        return newUrl;
+      }
+    );
   }
 
   private async updateTextDocument(document: vscode.TextDocument, json: AppState) {
